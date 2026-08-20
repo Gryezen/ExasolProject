@@ -1,3 +1,7 @@
 To view the elaborate Tasks , check the link below :
 
 https://docs.google.com/document/d/1XIVP52ZbwSrddhyigaDEMzolPupORsWQIpBXLpDMFkI/edit?usp=sharing
+
+Github link for exasol_starter_kit :
+
+https://github.com/exasol-labs/exasol-personal-local-starterkit/tree/main
