@@ -1,0 +1,71 @@
+"""
+database/queries.py — read helpers shared by api/routes.py and any future
+dashboard code. Kept separate from database/db.py (connection plumbing)
+and agents/*.py (write paths owned by a specific agent).
+"""
+
+from database.db import Database
+
+GET_DOCUMENT_SQL = """
+    SELECT doc_id, filename, document_type, vendor, status, page_count, uploaded_at
+    FROM DOCUMENTS WHERE doc_id = :doc_id
+"""
+
+LIST_DOCUMENTS_SQL = """
+    SELECT doc_id, filename, document_type, vendor, status, uploaded_at
+    FROM DOCUMENTS ORDER BY uploaded_at DESC
+"""
+
+GET_FIELDS_SQL = """
+    SELECT field_id, field_name, value, confidence, source_agent
+    FROM EXTRACTED_FIELDS WHERE doc_id = :doc_id
+"""
+
+GET_DISCREPANCIES_FOR_DOC_SQL = """
+    SELECT discrepancy_id, doc_id_1, doc_id_2, field_name, value_1, value_2, severity, status, explanation
+    FROM DISCREPANCIES WHERE doc_id_1 = :doc_id OR doc_id_2 = :doc_id
+"""
+
+GET_ACTIONS_FOR_DISCREPANCY_SQL = """
+    SELECT action_id, action_type, content, status, created_at, decided_at, decided_by
+    FROM ACTIONS WHERE discrepancy_id = :discrepancy_id
+"""
+
+GET_AUDIT_TIMELINE_SQL = """
+    SELECT log_id, agent_name, action, input_summary, output_summary, confidence, timestamp
+    FROM AUDIT_LOG WHERE doc_id = :doc_id ORDER BY timestamp ASC
+"""
+
+GET_OPEN_DISCREPANCIES_SQL = """
+    SELECT discrepancy_id, doc_id_1, doc_id_2, field_name, severity, status
+    FROM DISCREPANCIES WHERE status = 'open' ORDER BY detected_at DESC
+"""
+
+
+def get_document(db: Database, doc_id: str) -> tuple | None:
+    rows = db.fetchall(GET_DOCUMENT_SQL, {"doc_id": doc_id})
+    return rows[0] if rows else None
+
+
+def list_documents(db: Database) -> list[tuple]:
+    return db.fetchall(LIST_DOCUMENTS_SQL)
+
+
+def get_fields(db: Database, doc_id: str) -> list[tuple]:
+    return db.fetchall(GET_FIELDS_SQL, {"doc_id": doc_id})
+
+
+def get_discrepancies_for_document(db: Database, doc_id: str) -> list[tuple]:
+    return db.fetchall(GET_DISCREPANCIES_FOR_DOC_SQL, {"doc_id": doc_id})
+
+
+def get_actions_for_discrepancy(db: Database, discrepancy_id: str) -> list[tuple]:
+    return db.fetchall(GET_ACTIONS_FOR_DISCREPANCY_SQL, {"discrepancy_id": discrepancy_id})
+
+
+def get_audit_timeline(db: Database, doc_id: str) -> list[tuple]:
+    return db.fetchall(GET_AUDIT_TIMELINE_SQL, {"doc_id": doc_id})
+
+
+def get_open_discrepancies(db: Database) -> list[tuple]:
+    return db.fetchall(GET_OPEN_DISCREPANCIES_SQL)
