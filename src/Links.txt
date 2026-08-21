@@ -1,0 +1,10 @@
+To view the elaborate Tasks , check the link below :
+
+https://docs.google.com/document/d/1XIVP52ZbwSrddhyigaDEMzolPupORsWQIpBXLpDMFkI/edit?usp=sharing
+
+Github link for exasol_starter_kit :
+
+https://github.com/exasol-labs/exasol-personal-local-starterkit/tree/main
+
+ChatGpt Project link :
+https://chatgpt.com/g/g-p-6a86f38fbbd0819186d14ac0b32930dd-exasol-hackathon/project
