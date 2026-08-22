@@ -9,7 +9,7 @@ Two-tier approach, cheapest first:
      demo scenario (one vendor, three related docs) with no model call at
      all, so it's fast, free, and fully reproducible.
   2. If no rule matches but both documents have a document_type the rules
-     don't know about, fall back to a small Claude call that only answers
+     don't know about, fall back to a small model call that only answers
      yes/no + confidence on whether two specific documents are related —
      it never invents a relationship type outside what's asked.
 
@@ -19,7 +19,7 @@ when deterministic logic is enough to explain the decision.
 
 import uuid
 
-import anthropic
+from agents.llm_client import call_tool, LLMCallError
 
 from config import Settings
 from database.audit import log_event
@@ -156,8 +156,6 @@ def link_document(
     candidates = db.fetchall(GET_UNLINKED_CANDIDATES_SQL, {"doc_id": doc_id})
     created: list[RelationshipCandidate] = []
 
-    client = None  # lazily constructed only if the model fallback is actually needed
-
     for other_id, other_type, other_vendor in candidates:
         if _link_exists(db, doc_id, other_id):
             continue
@@ -182,29 +180,22 @@ def link_document(
         if not use_model_fallback or not same_vendor:
             continue  # don't spend a model call on candidates with no vendor overlap at all
 
-        if client is None:
-            client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
-
-        response = client.messages.create(
-            model=settings.reasoning_model,
-            max_tokens=256,
-            system=_SYSTEM_PROMPT,
-            tools=[_CANDIDATE_TOOL],
-            tool_choice={"type": "tool", "name": "assess_relationship"},
-            messages=[
-                {
-                    "role": "user",
-                    "content": (
-                        f"Document A: type={doc_type}, vendor={doc_vendor}\n"
-                        f"Document B: type={other_type}, vendor={other_vendor}"
-                    ),
-                }
-            ],
-        )
-        tool_use_block = next((b for b in response.content if b.type == "tool_use"), None)
-        if tool_use_block is None:
+        try:
+            result = call_tool(
+                api_key=settings.llm_api_key,
+                model=settings.reasoning_model,
+                system_prompt=_SYSTEM_PROMPT,
+                tool_name="assess_relationship",
+                tool_description=_CANDIDATE_TOOL["description"],
+                tool_schema=_CANDIDATE_TOOL["input_schema"],
+                user_content=(
+                    f"Document A: type={doc_type}, vendor={doc_vendor}\n"
+                    f"Document B: type={other_type}, vendor={other_vendor}"
+                ),
+                max_output_tokens=256,
+            )
+        except LLMCallError:
             continue
-        result = tool_use_block.input
 
         log_event(
             db,

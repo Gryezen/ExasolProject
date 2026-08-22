@@ -13,7 +13,7 @@ Defense in depth, in order:
 
 import re
 
-import anthropic
+from agents.llm_client import call_tool
 
 from config import Settings
 from database.audit import log_event
@@ -23,7 +23,7 @@ _SCHEMA_DESCRIPTION = """\
 Tables in DOC_INTEL (read-only):
 
 DOCUMENTS(doc_id, filename, document_type, vendor, status, source_path, page_count, uploaded_by, uploaded_at, updated_at)
-EXTRACTED_FIELDS(field_id, doc_id, field_name, value, confidence, source_agent, extracted_at)
+EXTRACTED_FIELDS(field_id, doc_id, field_name, field_value, confidence, source_agent, extracted_at)  -- note: column is "field_value", not "value" ("value" is a reserved word in Exasol SQL)
 DOCUMENT_RELATIONSHIPS(relationship_id, doc_id_1, doc_id_2, relationship_type, confidence, created_at)
 DISCREPANCIES(discrepancy_id, doc_id_1, doc_id_2, field_name, value_1, value_2, severity, status, explanation, detected_at)
 ACTIONS(action_id, discrepancy_id, doc_id, action_type, content, status, created_at, decided_at, decided_by)
@@ -94,22 +94,19 @@ def ask(
     audit_db is a normal (read-write) Database used ONLY to write the
     AUDIT_LOG row for this query — the query itself always runs on ro_db.
     """
-    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
-    response = client.messages.create(
+    payload = call_tool(
+        api_key=settings.llm_api_key,
         model=settings.chat_model,
-        max_tokens=1024,
-        system=_SYSTEM_PROMPT,
-        tools=[_SQL_TOOL],
-        tool_choice={"type": "tool", "name": "run_query"},
-        messages=[{"role": "user", "content": question}],
+        system_prompt=_SYSTEM_PROMPT,
+        tool_name="run_query",
+        tool_description=_SQL_TOOL["description"],
+        tool_schema=_SQL_TOOL["input_schema"],
+        user_content=question,
+        max_output_tokens=1024,
     )
 
-    tool_use_block = next((b for b in response.content if b.type == "tool_use"), None)
-    if tool_use_block is None:
-        raise ValueError("Chat model did not return a tool_use block")
-
-    generated_sql = tool_use_block.input["sql"]
-    explanation = tool_use_block.input["explanation"]
+    generated_sql = payload["sql"]
+    explanation = payload["explanation"]
 
     try:
         safe_sql = validate_sql(generated_sql)
@@ -123,7 +120,7 @@ def ask(
         )
         return {"sql": None, "explanation": explanation, "error": str(e)}
 
-    rows = ro_db.fetchall(safe_sql)
+    columns, rows = ro_db.fetchall_with_columns(safe_sql)
 
     log_event(
         audit_db,
@@ -133,4 +130,4 @@ def ask(
         output_summary=f"sql={safe_sql}, row_count={len(rows)}",
     )
 
-    return {"sql": safe_sql, "explanation": explanation, "rows": rows}
+    return {"sql": safe_sql, "explanation": explanation, "columns": columns, "rows": rows}

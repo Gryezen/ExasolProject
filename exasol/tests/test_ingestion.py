@@ -19,7 +19,7 @@ import pytest
 pytesseract = pytest.importorskip("pytesseract")
 pdf2image = pytest.importorskip("pdf2image")
 
-from agents.ingestion import _extract_image_text, _extract_pdf_text  # noqa: E402
+from agents.ingestion import _extract_image_text, _extract_pdf_text, ingest_document  # noqa: E402
 
 _TESSERACT_AVAILABLE = shutil.which("tesseract") is not None
 _POPPLER_AVAILABLE = shutil.which("pdftoppm") is not None
@@ -91,3 +91,38 @@ def test_native_pdf_skips_ocr(native_pdf):
     assert page_count == 1
     assert "Purchase Order" in text  # native text layer is exact, no OCR noise expected
     assert confidence is None  # native text layer present, OCR never runs
+
+
+class _FakeDatabase:
+    """Enough of Database to drive ingest_document() end to end: records
+    every execute() call instead of touching a real Exasol connection.
+    """
+
+    def __init__(self):
+        self.calls = []
+
+    def execute(self, sql, params=None):
+        self.calls.append((sql, params))
+
+
+def test_txt_upload_skips_ocr_like_a_native_pdf(tmp_path):
+    # Plain-text uploads (e.g. the .txt files in a realistic mixed-format
+    # case corpus) should be read directly, with no OCR confidence at all
+    # — same treatment as a PDF that already has a text layer.
+    path = tmp_path / "identity_document.txt"
+    path.write_text("Reference No: ID-0022\nName: Aryan Maharaj\n", encoding="utf-8")
+
+    db = _FakeDatabase()
+    result = ingest_document(db, str(path), filename="identity_document.txt")
+
+    assert "Aryan Maharaj" in result.text
+    assert result.page_count == 1
+    assert result.ocr_confidence is None
+
+    insert_calls = [p for sql, p in db.calls if "INSERT INTO DOCUMENTS" in sql]
+    assert len(insert_calls) == 1
+    assert insert_calls[0]["filename"] == "identity_document.txt"
+
+    audit_actions = [p["action"] for _, p in db.calls if p and "action" in p]
+    assert "ingested_document" in audit_actions
+    assert "low_quality_scan_warning" not in audit_actions  # no OCR ran, nothing to warn about

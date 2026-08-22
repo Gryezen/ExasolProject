@@ -11,7 +11,7 @@ import os
 import uuid
 from pathlib import Path
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from werkzeug.utils import secure_filename
 
 from agents import chat as chat_agent
@@ -22,12 +22,36 @@ from database.db import Database, ReadOnlyDatabase
 from database import queries
 from orchestration import workflow
 
-app = Flask(__name__)
+_FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+_ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".txt"}
+
+app = Flask(__name__, static_folder=str(_FRONTEND_DIR), static_url_path="")
 settings = load_settings()
 db = Database(settings)
 ro_db = ReadOnlyDatabase(settings)
 
-_ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".tiff", ".bmp"}
+@app.route("/", methods=["GET"])
+def index():
+    """Serve the single-page dashboard. Kept as an explicit route (rather
+    than relying solely on Flask's static handler for '/') so a fresh
+    clone with no frontend/ directory still gives a clear 404 instead of
+    Flask's default error page.
+    """
+    return send_from_directory(app.static_folder, "index.html")
+
+
+@app.route("/api/config", methods=["GET"])
+def get_config():
+    """Expose the handful of settings the frontend needs to render
+    correctly (e.g. which fields count as low-confidence) without
+    hardcoding them client-side and risking drift from the real gate.
+    """
+    return jsonify(
+        {
+            "confidence_threshold": settings.confidence_threshold,
+            "allowed_extensions": sorted(_ALLOWED_EXTENSIONS),
+        }
+    )
 
 
 def _row_to_dict(row: tuple, columns: list[str]) -> dict:
@@ -68,6 +92,25 @@ def get_discrepancies(doc_id: str):
 def get_audit_timeline(doc_id: str):
     rows = queries.get_audit_timeline(db, doc_id)
     cols = ["log_id", "agent_name", "action", "input_summary", "output_summary", "confidence", "timestamp"]
+    return jsonify([_row_to_dict(r, cols) for r in rows])
+
+
+@app.route("/api/documents/<doc_id>/actions", methods=["GET"])
+def get_actions(doc_id: str):
+    rows = queries.get_actions_for_document(db, doc_id)
+    cols = ["action_id", "discrepancy_id", "action_type", "content", "status", "created_at", "decided_at", "decided_by"]
+    return jsonify([_row_to_dict(r, cols) for r in rows])
+
+
+@app.route("/api/documents/<doc_id>/related", methods=["GET"])
+def get_related_documents(doc_id: str):
+    """The other documents in this citizen's / vendor's case — e.g. an
+    income certificate linked to the welfare application it supports.
+    Powers the case-file view so an officer isn't hunting through the
+    whole registry to find documents that belong together.
+    """
+    rows = queries.get_related_documents(db, doc_id)
+    cols = ["doc_id", "filename", "document_type", "vendor", "status", "relationship_type", "confidence"]
     return jsonify([_row_to_dict(r, cols) for r in rows])
 
 

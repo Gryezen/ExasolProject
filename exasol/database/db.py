@@ -81,3 +81,18 @@ class ReadOnlyDatabase:
         with self.connection() as conn:
             stmt = conn.execute(sql, params or {})
             return stmt.fetchall()
+
+    def fetchall_with_columns(
+        self, sql: str, params: dict[str, Any] | None = None
+    ) -> tuple[list[str], list[tuple]]:
+        """Same as fetchall(), but also returns the result's column names.
+
+        Used by the chat agent: the SQL it runs is generated at request
+        time, so callers have no fixed column list to zip rows against —
+        without this, a chat answer's rows would be unlabeled tuples.
+        """
+        with self.connection() as conn:
+            stmt = conn.execute(sql, params or {})
+            columns = list(stmt.columns().keys())
+            rows = stmt.fetchall()
+            return columns, rows

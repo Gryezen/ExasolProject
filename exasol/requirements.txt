@@ -1,5 +1,5 @@
 pyexasol>=2.3.1
-anthropic>=0.40.0
+google-genai>=1.2.0
 python-dotenv>=1.0.1
 flask>=3.0.0
 werkzeug>=3.0.0

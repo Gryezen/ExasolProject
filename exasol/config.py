@@ -50,8 +50,11 @@ class Settings:
     # Read-only connection, used ONLY by the chat agent's SQL execution path.
     exasol_ro: ExasolConnection
 
-    # LLM
-    anthropic_api_key: str
+    # LLM (Gemini). One key covers all three model slots below — Gemini's
+    # free tier makes "flash" a reasonable default for a hackathon budget;
+    # override any slot independently via env vars if a task needs more
+    # headroom (e.g. a "pro" model for reasoning).
+    llm_api_key: str
     extraction_model: str
     reasoning_model: str
     chat_model: str
@@ -77,10 +80,10 @@ def load_settings() -> Settings:
             password=_require("EXASOL_RO_PASSWORD"),
             schema=os.getenv("EXASOL_SCHEMA", "DOC_INTEL"),
         ),
-        anthropic_api_key=_require("ANTHROPIC_API_KEY"),
-        extraction_model=os.getenv("EXTRACTION_MODEL", "claude-sonnet-4-6"),
-        reasoning_model=os.getenv("REASONING_MODEL", "claude-sonnet-4-6"),
-        chat_model=os.getenv("CHAT_MODEL", "claude-sonnet-4-6"),
+        llm_api_key=_require("GEMINI_API_KEY"),
+        extraction_model=os.getenv("EXTRACTION_MODEL", "gemini-2.5-flash"),
+        reasoning_model=os.getenv("REASONING_MODEL", "gemini-2.5-flash"),
+        chat_model=os.getenv("CHAT_MODEL", "gemini-2.5-flash"),
         confidence_threshold=float(os.getenv("CONFIDENCE_THRESHOLD", "0.8")),
         upload_dir=os.getenv("UPLOAD_DIR", "./data/uploads"),
     )

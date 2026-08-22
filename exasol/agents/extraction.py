@@ -10,7 +10,7 @@ gate, reasoning) assumes EXTRACTED_FIELDS rows always exist in this shape.
 
 import uuid
 
-import anthropic
+from agents.llm_client import call_tool
 
 from config import Settings
 from database.audit import log_event
@@ -70,7 +70,7 @@ invent values that are not supported by the text — omit the field instead."""
 
 INSERT_FIELD_SQL = """
     INSERT INTO EXTRACTED_FIELDS
-        (field_id, doc_id, field_name, value, confidence, source_agent, extracted_at)
+        (field_id, doc_id, field_name, field_value, confidence, source_agent, extracted_at)
     VALUES
         (:field_id, :doc_id, :field_name, :value, :confidence, :source_agent, CURRENT_TIMESTAMP)
 """
@@ -95,36 +95,24 @@ def extract_fields(
     doc_id: str,
     document_text: str,
 ) -> list[ExtractedField]:
-    """Call Claude to extract fields, persist them, and return them.
+    """Call the extraction model to pull fields, persist them, and return them.
 
-    Raises anthropic.APIError subclasses on API failure and ValueError if
-    the model somehow doesn't call the tool (shouldn't happen with
-    tool_choice pinned, but the check is cheap and the failure mode is
+    Raises on API failure and agents.llm_client.LLMCallError if the model
+    somehow doesn't call the tool (shouldn't happen with the function call
+    forced, but the check is cheap and the failure mode is
     silent-and-wrong otherwise).
     """
-    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
-
-    response = client.messages.create(
+    payload = call_tool(
+        api_key=settings.llm_api_key,
         model=settings.extraction_model,
-        max_tokens=4096,
-        system=_SYSTEM_PROMPT,
-        tools=[_EXTRACT_TOOL],
-        tool_choice={"type": "tool", "name": "record_extracted_fields"},
-        messages=[
-            {
-                "role": "user",
-                "content": f"Extract structured fields from this document text:\n\n{document_text}",
-            }
-        ],
+        system_prompt=_SYSTEM_PROMPT,
+        tool_name="record_extracted_fields",
+        tool_description=_EXTRACT_TOOL["description"],
+        tool_schema=_EXTRACT_TOOL["input_schema"],
+        user_content=f"Extract structured fields from this document text:\n\n{document_text}",
+        max_output_tokens=4096,
     )
 
-    tool_use_block = next(
-        (b for b in response.content if b.type == "tool_use"), None
-    )
-    if tool_use_block is None:
-        raise ValueError("Extraction model did not return a tool_use block")
-
-    payload = tool_use_block.input
     fields_raw = payload.get("fields", [])
     document_type = payload.get("document_type")
     vendor = payload.get("vendor")

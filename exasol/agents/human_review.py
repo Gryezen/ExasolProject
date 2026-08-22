@@ -20,7 +20,7 @@ INSERT_REVIEW_SQL = """
 
 UPDATE_FIELD_VALUE_SQL = """
     UPDATE EXTRACTED_FIELDS
-    SET value = :value, confidence = 1.0, source_agent = 'human_review'
+    SET field_value = :value, confidence = 1.0, source_agent = 'human_review'
     WHERE field_id = :field_id
 """
 

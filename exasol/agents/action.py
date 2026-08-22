@@ -7,7 +7,7 @@ human to approve or reject.
 
 import uuid
 
-import anthropic
+from agents.llm_client import call_tool
 
 from config import Settings
 from database.audit import log_event
@@ -70,30 +70,21 @@ def draft_action_for_discrepancy(
         raise ValueError(f"No discrepancy found with id {discrepancy_id}")
     field_name, value_1, value_2, severity, explanation = rows[0]
 
-    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
-    response = client.messages.create(
+    draft = call_tool(
+        api_key=settings.llm_api_key,
         model=settings.reasoning_model,
-        max_tokens=1024,
-        system=_SYSTEM_PROMPT,
-        tools=[_ACTION_TOOL],
-        tool_choice={"type": "tool", "name": "draft_action"},
-        messages=[
-            {
-                "role": "user",
-                "content": (
-                    f"Discrepancy: field '{field_name}' disagrees "
-                    f"(value 1: {value_1!r}, value 2: {value_2!r}). "
-                    f"Severity: {severity}. Explanation: {explanation}"
-                ),
-            }
-        ],
+        system_prompt=_SYSTEM_PROMPT,
+        tool_name="draft_action",
+        tool_description=_ACTION_TOOL["description"],
+        tool_schema=_ACTION_TOOL["input_schema"],
+        user_content=(
+            f"Discrepancy: field '{field_name}' disagrees "
+            f"(value 1: {value_1!r}, value 2: {value_2!r}). "
+            f"Severity: {severity}. Explanation: {explanation}"
+        ),
+        max_output_tokens=1024,
     )
 
-    tool_use_block = next((b for b in response.content if b.type == "tool_use"), None)
-    if tool_use_block is None:
-        raise ValueError("Action model did not return a tool_use block")
-
-    draft = tool_use_block.input
     email_content = f"Subject: {draft['email_subject']}\n\n{draft['email_body']}"
 
     email_action_id = str(uuid.uuid4())

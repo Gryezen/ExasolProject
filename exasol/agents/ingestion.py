@@ -2,12 +2,14 @@
 agents/ingestion.py — turns an uploaded file into (a) a DOCUMENTS row and
 (b) plain text the extraction agent can read.
 
-Scope for the hackathon MVP: PDF (text layer or scanned) and common image
-formats. Native PDF text is used directly when present, since re-OCRing a
-clean text layer only introduces errors. Scanned PDFs (no text layer) and
-image uploads are OCR'd via Tesseract, with a per-document OCR confidence
-recorded in AUDIT_LOG so a consistently low-confidence scan is visible
-before it ever reaches the extraction agent.
+Scope for the hackathon MVP: PDF (text layer or scanned), common image
+formats, and plain text. Native PDF text is used directly when present,
+since re-OCRing a clean text layer only introduces errors. Scanned PDFs
+(no text layer) and image uploads are OCR'd via Tesseract, with a
+per-document OCR confidence recorded in AUDIT_LOG so a consistently
+low-confidence scan is visible before it ever reaches the extraction
+agent. Plain .txt uploads skip OCR entirely, same as a native PDF text
+layer.
 """
 
 import uuid
@@ -113,6 +115,13 @@ def ingest_document(
     elif suffix in (".png", ".jpg", ".jpeg", ".tiff", ".bmp"):
         text, ocr_confidence = _extract_image_text(path)
         page_count = 1
+    elif suffix == ".txt":
+        # Plain-text uploads (e.g. an emailed form, or an already-OCR'd
+        # document handed off from another system) — no OCR needed, same
+        # as a native PDF text layer.
+        text = path.read_text(encoding="utf-8", errors="replace")
+        page_count = 1
+        ocr_confidence = None
     else:
         raise ValueError(f"Unsupported file type: {suffix}")
 

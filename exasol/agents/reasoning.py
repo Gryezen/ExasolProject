@@ -8,7 +8,7 @@ the chat agent and displayed consistently in the audit timeline.
 
 import uuid
 
-import anthropic
+from agents.llm_client import call_tool
 
 from config import Settings
 from database.audit import log_event
@@ -72,7 +72,7 @@ INSERT_DISCREPANCY_SQL = """
 """
 
 GET_FIELDS_SQL = """
-    SELECT field_name, value, confidence
+    SELECT field_name, field_value AS value, confidence
     FROM EXTRACTED_FIELDS
     WHERE doc_id = :doc_id
 """
@@ -106,30 +106,22 @@ def compare_documents(
     fields_1 = db.fetchall(GET_FIELDS_SQL, {"doc_id": doc_id_1})
     fields_2 = db.fetchall(GET_FIELDS_SQL, {"doc_id": doc_id_2})
 
-    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
-    response = client.messages.create(
+    payload = call_tool(
+        api_key=settings.llm_api_key,
         model=settings.reasoning_model,
-        max_tokens=4096,
-        system=_SYSTEM_PROMPT,
-        tools=[_REASONING_TOOL],
-        tool_choice={"type": "tool", "name": "record_discrepancies"},
-        messages=[
-            {
-                "role": "user",
-                "content": (
-                    f"Document A fields:\n{_fields_to_text(fields_1)}\n\n"
-                    f"Document B fields:\n{_fields_to_text(fields_2)}\n\n"
-                    "Compare and record any real discrepancies."
-                ),
-            }
-        ],
+        system_prompt=_SYSTEM_PROMPT,
+        tool_name="record_discrepancies",
+        tool_description=_REASONING_TOOL["description"],
+        tool_schema=_REASONING_TOOL["input_schema"],
+        user_content=(
+            f"Document A fields:\n{_fields_to_text(fields_1)}\n\n"
+            f"Document B fields:\n{_fields_to_text(fields_2)}\n\n"
+            "Compare and record any real discrepancies."
+        ),
+        max_output_tokens=4096,
     )
 
-    tool_use_block = next((b for b in response.content if b.type == "tool_use"), None)
-    if tool_use_block is None:
-        raise ValueError("Reasoning model did not return a tool_use block")
-
-    discrepancies_raw = tool_use_block.input.get("discrepancies", [])
+    discrepancies_raw = payload.get("discrepancies", [])
     results: list[Discrepancy] = []
     for d in discrepancies_raw:
         discrepancy_id = str(uuid.uuid4())
