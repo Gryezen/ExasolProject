@@ -17,7 +17,7 @@ LIST_DOCUMENTS_SQL = """
 """
 
 GET_FIELDS_SQL = """
-    SELECT field_id, field_name, field_value AS "value", confidence, source_agent
+    SELECT field_id, field_name, field_value AS value, confidence, source_agent
     FROM EXTRACTED_FIELDS WHERE doc_id = {doc_id}
 """
 
@@ -32,7 +32,7 @@ GET_ACTIONS_FOR_DISCREPANCY_SQL = """
 """
 
 GET_AUDIT_TIMELINE_SQL = """
-    SELECT log_id, agent_name, action_name AS "action", input_summary, output_summary, confidence, logged_at AS "timestamp"
+    SELECT log_id, agent_name, action_name AS action, input_summary, output_summary, confidence, logged_at AS timestamp
     FROM AUDIT_LOG WHERE doc_id = {doc_id} ORDER BY logged_at ASC
 """
 
@@ -62,14 +62,6 @@ GET_RELATED_DOCUMENTS_SQL = """
       ON d.doc_id = CASE WHEN r.doc_id_1 = {doc_id} THEN r.doc_id_2 ELSE r.doc_id_1 END
     WHERE r.doc_id_1 = {doc_id} OR r.doc_id_2 = {doc_id}
     ORDER BY r.created_at ASC
-"""
-
-GET_STATS_SQL = """
-    SELECT
-        (SELECT COUNT(*) FROM DOCUMENTS) AS "documents_total",
-        (SELECT COUNT(*) FROM EXTRACTED_FIELDS WHERE confidence >= {threshold!f}) AS "high_confidence_fields",
-        (SELECT COUNT(*) FROM DOCUMENTS WHERE status = 'review') AS "needs_review",
-        (SELECT COUNT(*) FROM ACTIONS) AS "actions_triggered"
 """
 
 
@@ -108,8 +100,3 @@ def get_actions_for_document(db: Database, doc_id: str) -> list[tuple]:
 
 def get_related_documents(db: Database, doc_id: str) -> list[tuple]:
     return db.fetchall(GET_RELATED_DOCUMENTS_SQL, {"doc_id": doc_id})
-
-
-def get_stats(db: Database, threshold: float) -> tuple:
-    rows = db.fetchall(GET_STATS_SQL, {"threshold": threshold})
-    return rows[0]

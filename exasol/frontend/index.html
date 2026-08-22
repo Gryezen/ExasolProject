@@ -1,903 +1,1957 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Citizen Case Registry — Document Intelligence</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JARD — Document Intelligence Platform</title>
 <style>
-  :root {
-    /* paper canvas + panels */
-    --bg: #F7F5EC;
-    --surface: #FFFFFF;
-    --surface-raised: #EFE9D6;
-    --hairline: #C6BC9C;
-    --ink: #1B1B17;
-    --muted: #52504A;
-    --faint: #7C775F;
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Inter:wght@400;500;600;700&display=swap');
+:root{--bg:#f6f8fa;--surface:#fff;--ink:#17212b;--muted:#66717d;--line:#d9dee5;--blue:#164b78;--blue2:#eaf2f8;--green:#18794e;--greenbg:#eaf6ef;--amber:#a15c00;--amberbg:#fff4e5;--red:#b42318;--redbg:#fdecec;--info:#175cd3;--shadow:0 2px 8px rgba(23,33,43,.05);--r:7px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}
+a{color:inherit;text-decoration:none}.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:12px}.eyebrow{text-transform:uppercase;letter-spacing:.09em;font-size:11px;font-weight:700;color:var(--blue)}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:6px;font-weight:600}.btn:hover{background:#f5f7f9}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.danger{color:var(--red)}.btn.success{color:var(--green)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:5px;font-size:12px;font-weight:650}.badge.ok{background:var(--greenbg);color:var(--green)}.badge.warn{background:var(--amberbg);color:var(--amber)}.badge.bad{background:var(--redbg);color:var(--red)}.badge.info{background:var(--blue2);color:var(--info)}
+.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.landing header{height:68px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 6vw;position:sticky;top:0;z-index:10}.brand{display:flex;gap:11px;align-items:center;font-weight:750}.brandmark{width:30px;height:30px;background:var(--blue);color:#fff;border-radius:5px;display:grid;place-items:center;font-weight:800}.nav{display:flex;gap:26px;color:#52606d}.nav a:hover{color:var(--blue)}
+.hero{max-width:1180px;margin:auto;padding:90px 28px 75px;display:grid;grid-template-columns:1.15fr .85fr;gap:70px;align-items:center}.hero h1{font-size:44px;line-height:1.08;letter-spacing:-.035em;margin:12px 0 20px;max-width:650px}.hero p{font-size:17px;color:var(--muted);max-width:650px}.actions{display:flex;gap:10px;margin-top:28px}.case{background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:22px}.casehead{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:15px}.case h3{margin:0 0 3px}.docrow{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #edf0f2}.docrow:last-child{border:0}.section{padding:78px 6vw}.section.white{background:#fff}.container{max-width:1180px;margin:auto}.section h2{font-size:28px;letter-spacing:-.02em;margin:7px 0 12px}.lead{color:var(--muted);max-width:720px;font-size:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px}.workflow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:30px}.step{background:#fff;border:1px solid var(--line);padding:18px;border-radius:7px;position:relative}.step strong{display:block;margin:6px 0}.step:after{content:"→";position:absolute;right:-15px;top:34px;color:#9aa4ae}.step:last-child:after{display:none}.architecture{background:#17212b;color:#fff;border-radius:8px;padding:28px;margin-top:28px;overflow:auto}.archline{font-family:ui-monospace,SFMono-Regular,monospace;color:#d9e3ec;white-space:pre}
+footer{background:#17212b;color:#dbe2e8;padding:30px 6vw}.footerin{max-width:1180px;margin:auto;display:flex;justify-content:space-between}
+.app{display:none;min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:230px;background:#fff;border-right:1px solid var(--line);z-index:20}.sidebrand{height:68px;padding:0 20px;border-bottom:1px solid var(--line);display:flex;align-items:center}.sidegroup{padding:17px 12px 5px;color:#89939d;font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.08em}.sidebtn{width:100%;border:0;background:transparent;text-align:left;padding:9px 12px;border-radius:5px;color:#4e5a66;display:flex;gap:10px;align-items:center}.sidebtn:hover,.sidebtn.active{background:var(--blue2);color:var(--blue);font-weight:650}.topbar{position:fixed;left:230px;right:0;top:0;height:68px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 25px;z-index:15}.search{width:340px;border:1px solid var(--line);border-radius:6px;padding:9px 12px;background:#fafbfc}.main{margin-left:230px;padding:98px 28px 40px;max-width:1500px}.pagehead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}.pagehead h1{font-size:27px;margin:0 0 4px;letter-spacing:-.02em}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}.metric{background:#fff;border:1px solid var(--line);padding:18px;border-radius:7px}.metric .num{font-size:25px;font-weight:750;margin-top:4px}.panel{background:#fff;border:1px solid var(--line);border-radius:7px;margin-bottom:18px}.panelhead{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.panelhead h3{margin:0;font-size:15px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px 16px;border-bottom:1px solid #edf0f2;white-space:nowrap}th{font-size:12px;color:#68737e;background:#fafbfc;font-weight:700}tr:hover td{background:#fbfcfd}.toolbar{display:flex;gap:9px;align-items:center;margin-bottom:15px}.toolbar input,.toolbar select{border:1px solid var(--line);background:#fff;border-radius:6px;padding:9px 11px}.toolbar input{min-width:280px}.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}.preview{min-height:480px;background:#eef1f4;border:1px solid var(--line);padding:30px;display:flex;justify-content:center}.paper{background:#fff;width:80%;min-height:420px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:32px}.field{display:grid;grid-template-columns:1fr auto;gap:8px;padding:13px 0;border-bottom:1px solid #edf0f2}.field .value{font-weight:650;text-align:right}.confidence{font-size:11px;margin-top:2px}.reviewgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.timeline{padding:20px}.event{display:grid;grid-template-columns:90px 15px 1fr;gap:12px;padding:11px 0}.dot{width:9px;height:9px;border:2px solid var(--blue);border-radius:50%;margin-top:6px}.event:not(:last-child) .dot:after{content:"";display:block;width:1px;height:40px;background:var(--line);margin:7px 0 0 2px}.empty{padding:45px;text-align:center;color:var(--muted)}.notice{padding:13px 15px;border:1px solid #c9dced;background:var(--blue2);color:#19486c;border-radius:6px}.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:18px}.tab{padding:10px 15px;border:0;background:transparent;color:var(--muted);border-bottom:2px solid transparent}.tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:650}.hero .case .statusline{display:flex;justify-content:space-between;align-items:center}.pillbar{display:flex;gap:7px;flex-wrap:wrap}
+@media(max-width:900px){.hero{grid-template-columns:1fr;gap:35px}.grid3,.workflow{grid-template-columns:1fr 1fr}.workflow .step:after{display:none}.nav{display:none}.summary{grid-template-columns:1fr 1fr}.sidebar{width:64px}.sidebar .label,.sidegroup,.sidebrand .brandtext{display:none}.sidebtn{justify-content:center}.topbar{left:64px}.main{margin-left:64px}.search{width:220px}.split,.reviewgrid{grid-template-columns:1fr}}
+@media(max-width:600px){.hero{padding-top:55px}.hero h1{font-size:35px}.grid3,.workflow,.summary{grid-template-columns:1fr}.section{padding:55px 5vw}.main{padding:88px 15px 25px}.topbar{padding:0 12px}.search{display:none}.pagehead{gap:10px}.pagehead .btn{padding:8px}.case{padding:16px}.paper{width:100%}.footerin{display:block}}
 
-    /* Ashoka Chakra navy — primary accent, links, focus */
-    --accent: #0B3D91;
-    --accent-dim: #DCE6F5;
+.authback{position:fixed;inset:0;background:rgba(23,33,43,.42);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.authmodal{width:min(880px,100%);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 18px 60px rgba(23,33,43,.18);display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.authphoto{min-height:540px;background-size:cover;background-position:center;position:relative}
+.authphoto:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(22,75,120,.15),rgba(22,75,120,.02))}
+.authcontent{padding:30px}.authclose{float:right;border:0;background:transparent;font-size:22px;color:var(--muted);line-height:1}
+.authcontent h2{font-size:25px;margin:6px 0}.authcontent p{margin:5px 0 22px;color:var(--muted)}
+.auth-tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:20px}.auth-tab{flex:1;padding:10px;border:0;background:transparent;color:var(--muted);border-bottom:2px solid transparent}.auth-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
+.authform label{display:block;font-size:12px;font-weight:650;margin:13px 0 5px}.authform input{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:6px;outline:0}.authform input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(22,75,120,.08)}
+.photo-band{height:300px;background:url("https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1800&q=85") center 48%/cover no-repeat;position:relative}.photo-band:after{content:"";position:absolute;inset:0;background:rgba(23,33,43,.34)}.photo-caption{position:relative;z-index:1;max-width:1180px;margin:auto;height:100%;display:flex;align-items:flex-end;padding:0 28px 32px;color:#fff}.photo-caption h2{font-size:28px;margin:0 0 5px}.photo-caption p{margin:0;color:#e9eef2}
+.account-wrap{position:relative}.account-btn{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 9px}.avatar{width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:750}.account-menu{position:absolute;right:0;top:43px;width:190px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:7px;padding:6px;display:none}.account-menu.show{display:block}.account-menu button{width:100%;text-align:left;border:0;background:#fff;padding:9px;border-radius:5px}.account-menu button:hover{background:#f4f7f9}.account-menu .logout{color:var(--red)}
+@media(max-width:720px){.authmodal{grid-template-columns:1fr}.authphoto{display:none}.photo-band{height:240px}}
 
-    /* status: high=danger/saffron-red, medium=ochre, low=India green */
-    --high: #A32A20;
-    --high-dim: #FBE7E3;
-    --medium: #8A5F00;
-    --medium-dim: #FBF1D6;
-    --low: #0B6623;
-    --low-dim: #E2F2E3;
+/* JARD refined dark institutional theme */
+:root{
+  --bg:#0d141b;--surface:#141d26;--surface2:#18232d;--ink:#eef3f7;--muted:#9aa8b5;
+  --line:#2a3743;--blue:#6fa8d6;--blue2:#172d40;--green:#5fc28a;--greenbg:#12291f;
+  --amber:#e5a657;--amberbg:#302516;--red:#ef8179;--redbg:#321a19;--info:#76a9ef;
+  --shadow:0 8px 24px rgba(0,0,0,.22);--r:6px
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:"Inter","Avenir Next","Segoe UI",system-ui,sans-serif}
+.muted{color:var(--muted)}
+.landing header,.section.white,.sidebar,.topbar,.panel,.metric,.card,.case,.authmodal,.account-menu{
+  background:var(--surface);border-color:var(--line)
+}
+.landing header{box-shadow:0 1px 0 rgba(255,255,255,.02)}
+.nav a{color:#c2ccd5}.nav a:hover{color:#fff}
+.brandmark{background:#e9f1f7;color:#132536}
+.btn{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn:hover{background:var(--surface2)}
+.btn.primary{background:#dceaf4;border-color:#dceaf4;color:#122536}
+.hero p,.lead{color:var(--muted)}
+.case .docrow{border-color:var(--line)}
+.photo-band:after{background:rgba(5,10,14,.50)}
+.section{background:var(--bg)}
+.workflow .step,.grid3 .card{background:var(--surface)}
+.step:after{color:#71808e}
+.architecture{background:#080d12;border:1px solid #25313c}
+.paper{background:#f7f8f9;color:#18232d}
+.paper hr{border-color:#d5dbe0}
+.preview{background:#0a1117;border-color:var(--line)}
+th{background:#101820;color:#aeb9c3}
+td{border-color:#25313b}
+tr:hover td{background:#18222b}
+.toolbar input,.toolbar select,.search,.authform input{
+  background:#101820;color:var(--ink);border-color:var(--line)
+}
+.toolbar input::placeholder,.search::placeholder,.authform input::placeholder{color:#6f7e8b}
+.notice{background:#12283a;border-color:#284b67;color:#b9d5ea}
+.badge.ok{background:var(--greenbg);color:var(--green)}
+.badge.warn{background:var(--amberbg);color:var(--amber)}
+.badge.bad{background:var(--redbg);color:var(--red)}
+.badge.info{background:#152842;color:var(--info)}
+.sidebtn{color:#aeb9c3}
+.sidebtn:hover,.sidebtn.active{background:#172d40;color:#a9d1f1}
+.sidegroup{color:#687887}
+.topbar{box-shadow:0 1px 0 rgba(255,255,255,.02)}
+.account-btn{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.account-menu button{background:var(--surface);color:var(--ink)}
+.account-menu button:hover{background:var(--surface2)}
+.authback{background:rgba(0,0,0,.72)}
+.authcontent{background:var(--surface)}
+.authclose{color:var(--muted)}
+.auth-tabs{border-color:var(--line)}
+.auth-tab{color:var(--muted)}
+.auth-tab.active{color:#a9d1f1;border-color:#6fa8d6}
+.authform input:focus{border-color:#6fa8d6;box-shadow:0 0 0 3px rgba(111,168,214,.12)}
+footer{background:#080d12;border-top:1px solid #202b35}
+.eyebrow{color:#78acd4}
 
-    /* national tricolour, used sparingly for the identity strip */
-    --saffron: #FF9933;
-    --india-green: #138808;
-  }
 
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    display: flex;
-    flex-direction: column;
-  }
-  ::selection { background: var(--accent-dim); }
+/* Editorial JARD landing refinement */
+:root{
+  --serif:"Bodoni Moda","Didot","Bodoni 72","Times New Roman",serif;
+  --display:#17212b;
+  --photo-border:rgba(23,33,43,.12);
+}
+html[data-theme="dark"]{
+  --bg:#0d1217;--surface:#141b21;--surface2:#192229;--ink:#f2eee8;--muted:#a6afb7;
+  --line:#2b353d;--blue:#a9c9df;--blue2:#1c2b35;--display:#f3eee7;
+  --shadow:0 18px 50px rgba(0,0,0,.30)
+}
+body{font-family:"Inter",sans-serif;transition:background .35s ease,color .35s ease}
+h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-.035em}
+.landing h1{font-size:clamp(54px,7vw,92px);line-height:.94;color:var(--display);margin:18px 0 24px}
+.landing h1 em{font-style:normal;font-weight:400}
+.landing h2{font-size:clamp(34px,4vw,52px);line-height:1.02}
+.brand-word{font-family:var(--serif);font-size:22px;letter-spacing:.08em}
+.site-header{height:76px;position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:color-mix(in srgb,var(--surface) 90%,transparent)}
+.header-actions{display:flex;align-items:center;gap:10px}
+.theme-toggle{width:38px;height:38px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:50%;font-size:16px}
+.theme-toggle:hover{transform:rotate(12deg);background:var(--surface2)}
+.hero{max-width:1240px;margin:0 auto;padding:86px 28px 105px;display:grid;grid-template-columns:.9fr 1.1fr;gap:70px;align-items:center;min-height:690px}
+.hero-copy{max-width:590px}
+.hero-copy>p{max-width:500px;font-size:17px;line-height:1.7;color:var(--muted)}
+.text-link{font-size:14px;font-weight:600;border-bottom:1px solid var(--line);padding-bottom:4px}
+.text-link span{display:inline-block;margin-left:5px;transition:transform .25s}
+.text-link:hover span{transform:translate(3px,-3px)}
+.hero-visual{position:relative;height:590px}
+.image-card{position:absolute;overflow:hidden;border:1px solid var(--photo-border);box-shadow:var(--shadow);background:#ddd}
+.image-card img,.editorial-image img{width:100%;height:100%;object-fit:cover;display:block}
+.image-main{right:8%;top:8px;width:70%;height:470px;transform:rotate(1.2deg);animation:floatMain 8s ease-in-out infinite}
+.image-main:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,.5))}
+.image-label{position:absolute;left:25px;right:25px;bottom:24px;z-index:2;color:white}
+.image-label span{display:block;font-size:10px;letter-spacing:.16em;margin-bottom:7px;opacity:.8}
+.image-label b{font-family:var(--serif);font-size:25px;font-weight:400}
+.image-small{left:2%;bottom:18px;width:38%;height:250px;transform:rotate(-4deg);animation:floatSmall 7s ease-in-out infinite}
+.status-chip{position:absolute;left:14px;bottom:14px;background:rgba(255,255,255,.94);color:#16222b;border-radius:30px;padding:8px 12px;font-size:11px;font-weight:600}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#3d9b68;margin-right:6px}
+.floating-doc{position:absolute;right:0;top:52%;z-index:4;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);padding:17px 19px;width:190px;animation:floatCard 6s ease-in-out infinite}
+.floating-doc b{display:block;margin-top:5px;font-size:13px}
+.mini-line{display:flex;gap:4px;margin-top:13px}.mini-line span{height:3px;background:var(--blue);opacity:.55;display:block}.mini-line span:nth-child(1){width:48%}.mini-line span:nth-child(2){width:28%}.mini-line span:nth-child(3){width:14%}
+.editorial-photo{max-width:1240px;margin:0 auto;padding:30px 28px 105px;display:grid;grid-template-columns:1.45fr .75fr;gap:70px;align-items:center}
+.editorial-image{height:410px;overflow:hidden;border:1px solid var(--photo-border)}
+.editorial-image img{transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.editorial-photo:hover .editorial-image img{transform:scale(1.035)}
+.editorial-copy{max-width:380px}
+.editorial-copy p{color:var(--muted);font-size:16px;line-height:1.7}
+.section{transition:background .35s ease}
+.card,.step,.panel,.metric,.case,.architecture{transition:transform .25s ease,border-color .25s ease,background .35s ease}
+.card:hover,.step:hover{transform:translateY(-3px)}
+@keyframes floatMain{0%,100%{transform:rotate(1.2deg) translateY(0)}50%{transform:rotate(1.2deg) translateY(-8px)}}
+@keyframes floatSmall{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(-4deg) translateY(10px)}}
+@keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@media(max-width:900px){.hero{grid-template-columns:1fr;gap:25px}.hero-visual{height:500px}.editorial-photo{grid-template-columns:1fr;gap:35px}}
+@media(max-width:600px){.nav{gap:12px}.nav a{font-size:12px}.hero{padding-top:55px}.hero-visual{height:420px}.image-main{height:350px}.image-small{height:180px}.floating-doc{display:none}.editorial-photo{padding-bottom:70px}.editorial-image{height:280px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
-  /* national tricolour identity strip */
-  .tricolour-strip { display: flex; height: 4px; width: 100%; }
-  .tricolour-strip span { flex: 1; }
-  .tricolour-strip .saffron { background: var(--saffron); }
-  .tricolour-strip .white { background: #FFFFFF; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
-  .tricolour-strip .green { background: var(--india-green); }
 
-  /* Ashoka Chakra watermark, fixed behind all content */
-  .chakra-watermark {
-    position: fixed;
-    top: 50%; left: 50%;
-    width: 62vmax; height: 62vmax;
-    transform: translate(-50%, -50%);
-    color: var(--accent);
-    opacity: 0.045;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .shell { position: relative; z-index: 1; }
+/* Final theme system: light and dark are both fully defined */
+html[data-theme="light"]{
+  --bg:#f7f4ef;--surface:#fffdf9;--surface2:#f0ece5;--ink:#20252a;--muted:#68727b;
+  --line:#ddd7cf;--blue:#315f7d;--blue2:#e8eff3;--green:#28734b;--greenbg:#e8f3ec;
+  --amber:#9a651f;--amberbg:#f7eedf;--red:#a74742;--redbg:#f8e8e6;--info:#426f9e;
+  --shadow:0 12px 35px rgba(38,35,30,.10);--display:#17191b;--photo-border:rgba(30,30,30,.12);
+}
+html[data-theme="dark"]{
+  --bg:#0d1217;--surface:#141b21;--surface2:#192229;--ink:#f2eee8;--muted:#a6afb7;
+  --line:#2b353d;--blue:#a9c9df;--blue2:#1c2b35;--green:#5fc28a;--greenbg:#12291f;
+  --amber:#e5a657;--amberbg:#302516;--red:#ef8179;--redbg:#321a19;--info:#76a9ef;
+  --shadow:0 18px 50px rgba(0,0,0,.30);--display:#f3eee7;--photo-border:rgba(255,255,255,.12);
+}
+body,.landing,.app,.section,.site-header,.topbar,.sidebar,.panel,.card,.metric,.case,
+.architecture,.account-menu,.authcontent,.account-btn,.btn,.toolbar input,.toolbar select,
+.search,.authform input,th,td,footer{
+  transition:background-color .35s ease,color .35s ease,border-color .35s ease,box-shadow .35s ease;
+}
+html[data-theme="light"] .landing header{
+  background:rgba(255,253,249,.92);
+  color:var(--ink);
+}
+html[data-theme="dark"] .landing header{
+  background:rgba(20,27,33,.92);
+  color:var(--ink);
+}
+html[data-theme="light"] .section.white{background:#fffdf9}
+html[data-theme="dark"] .section.white{background:#11181e}
+html[data-theme="light"] .hero .btn.primary{
+  background:#202b33;color:#fff;border-color:#202b33;
+}
+html[data-theme="dark"] .hero .btn.primary{
+  background:#e8eef2;color:#15222b;border-color:#e8eef2;
+}
+html[data-theme="light"] .image-card{background:#e7e0d6}
+html[data-theme="light"] .status-chip{background:rgba(255,253,249,.96)}
+html[data-theme="dark"] .status-chip{background:rgba(20,27,33,.96);color:#f2eee8}
+.nav{margin-left:auto;margin-right:22px}
 
-  .mono { font-family: 'IBM Plex Mono', monospace; }
 
-  a { color: inherit; }
-  button {
-    font-family: inherit;
-    cursor: pointer;
-    border: 1px solid var(--hairline);
-    background: var(--surface-raised);
-    color: var(--ink);
-    border-radius: 3px;
-    padding: 7px 12px;
-    font-size: 13px;
-    transition: border-color .15s ease, background .15s ease;
-  }
-  button:hover:not(:disabled) { border-color: var(--accent); }
-  button:disabled { opacity: .4; cursor: not-allowed; }
-  button.primary { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); font-weight: 600; }
-  button.primary:hover:not(:disabled) { background: var(--accent); color: #FFFFFF; }
-  button.danger { border-color: var(--high); color: var(--high); }
-  button.danger:hover:not(:disabled) { background: var(--high-dim); }
-  input[type=text], textarea {
-    font-family: inherit;
-    background: var(--bg);
-    border: 1px solid var(--hairline);
-    color: var(--ink);
-    border-radius: 3px;
-    padding: 8px 10px;
-    font-size: 13px;
-  }
-  input[type=text]:focus, textarea:focus, button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
+.image-gallery{max-width:1240px;margin:0 auto;padding:35px 28px 110px}
+.gallery-head{display:flex;justify-content:space-between;align-items:end;gap:40px;margin-bottom:28px}
+.gallery-head h2{margin:7px 0 0}
+.gallery-head p{max-width:360px;color:var(--muted);font-size:14px;line-height:1.65}
+.gallery-grid{display:grid;grid-template-columns:1.5fr .75fr .75fr;gap:14px}
+.gallery-item{margin:0;height:260px;overflow:hidden;border:1px solid var(--photo-border);background:var(--surface)}
+.gallery-wide{height:330px}
+.gallery-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.82);transition:transform 1.1s cubic-bezier(.2,.7,.2,1),filter .5s ease}
+.gallery-item:hover img{transform:scale(1.045);filter:saturate(1)}
+@media(max-width:800px){
+  .nav{margin-left:auto;margin-right:10px;gap:14px}
+  .gallery-head{display:block}.gallery-head p{margin-top:12px}
+  .gallery-grid{grid-template-columns:1fr 1fr}.gallery-wide{grid-column:1/-1}
+}
+@media(max-width:560px){
+  .site-header{padding:0 18px!important}.brand-word{font-size:19px}.nav{gap:10px;margin-right:4px}.nav a{font-size:11px}
+  .theme-toggle{width:34px;height:34px}.header-actions .btn{padding:8px 10px;font-size:12px}
+  .gallery-grid{grid-template-columns:1fr}.gallery-wide{grid-column:auto}
+}
 
-  /* ---------- shell ---------- */
-  .shell {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    grid-template-rows: auto 1fr;
-    flex: 1;
-    min-height: 0;
-  }
-  header.top {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    padding: 16px 24px;
-    border-bottom: 2px solid var(--accent);
-    background: var(--surface);
-  }
-  header.top .mark {
-    font-family: 'Fraunces', serif;
-    font-size: 21px;
-    font-weight: 600;
-    letter-spacing: .01em;
-  }
-  header.top .mark .stamp {
-    display: inline-block;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .08em;
-    padding: 1px 6px;
-    border-radius: 2px;
-    vertical-align: middle;
-    margin-left: 8px;
-    transform: translateY(-2px);
-  }
-  header.top .tagline { color: var(--muted); font-size: 12.5px; }
-  header.top .spacer { flex: 1; }
-  header.top .threshold {
-    color: var(--faint);
-    font-size: 12px;
-    font-family: 'IBM Plex Mono', monospace;
-  }
 
-  /* ---------- sidebar / registry ---------- */
-  aside.registry {
-    border-right: 1px solid var(--hairline);
-    background: var(--surface);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  .registry-head {
-    padding: 16px 18px 12px;
-    border-bottom: 1px solid var(--hairline);
-  }
-  .registry-head .eyebrow {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .12em;
-    color: var(--faint);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  .dropzone {
-    border: 2px dashed var(--hairline);
-    border-radius: 4px;
-    padding: 14px 10px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 12.5px;
-    cursor: pointer;
-    transition: border-color .15s ease, color .15s ease, background .15s ease;
-  }
-  .dropzone:hover, .dropzone.drag { border-color: var(--accent); color: var(--ink); background: var(--accent-dim); }
-  .dropzone input { display: none; }
-  .dropzone .hint { display: block; margin-top: 3px; color: var(--faint); font-size: 11px; }
-  .upload-status { font-size: 11.5px; color: var(--faint); margin-top: 8px; min-height: 14px; font-family: 'IBM Plex Mono', monospace; }
+/* Refined editorial light mode */
+html[data-theme="light"]{
+  --bg:#f4f1eb;
+  --surface:#fffefa;
+  --surface2:#eeeae3;
+  --ink:#1d2328;
+  --muted:#6d7479;
+  --line:#d9d4cc;
+  --blue:#315b75;
+  --blue2:#e8eef1;
+  --display:#17191b;
+  --photo-border:rgba(35,32,27,.13);
+  --shadow:0 14px 42px rgba(42,37,30,.09);
+}
+html[data-theme="light"] body{
+  background:#f4f1eb;
+  color:#1d2328;
+}
+html[data-theme="light"] .landing header{
+  background:rgba(255,254,250,.88);
+  border-bottom:1px solid rgba(35,32,27,.08);
+  box-shadow:none;
+}
+html[data-theme="light"] .hero{
+  background:transparent;
+}
+html[data-theme="light"] .hero-copy>p,
+html[data-theme="light"] .story-copy p,
+html[data-theme="light"] .lead{
+  color:#626a70;
+}
+html[data-theme="light"] .btn{
+  background:#fffefa;
+  border-color:#d5d0c8;
+  color:#22282d;
+}
+html[data-theme="light"] .btn.primary{
+  background:#202a31;
+  color:#fff;
+  border-color:#202a31;
+}
+html[data-theme="light"] .text-link{
+  color:#293238;
+  border-color:#bdb7af;
+}
+html[data-theme="light"] .section.white{
+  background:#fffefa;
+}
+html[data-theme="light"] .section:not(.white){
+  background:#f4f1eb;
+}
+html[data-theme="light"] .card,
+html[data-theme="light"] .step,
+html[data-theme="light"] .panel,
+html[data-theme="light"] .metric,
+html[data-theme="light"] .case{
+  background:#fffefa;
+  border-color:#ddd7cf;
+}
+html[data-theme="light"] .eyebrow{
+  color:#5a7384;
+  letter-spacing:.14em;
+}
+html[data-theme="light"] .theme-toggle{
+  background:#fffefa;
+  color:#242a2e;
+  border-color:#d5d0c8;
+}
+html[data-theme="light"] .account-btn{
+  background:#fffefa;
+  color:#20262b;
+  border-color:#d5d0c8;
+}
 
-  .doc-list { flex: 1; overflow-y: auto; }
-  .doc-item {
-    padding: 12px 18px;
-    border-bottom: 1px solid var(--hairline);
-    cursor: pointer;
-    position: relative;
-  }
-  .doc-item:hover { background: var(--surface-raised); }
-  .doc-item.active { background: var(--surface-raised); }
-  .doc-item.active::before {
-    content: "";
-    position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
-    background: var(--accent);
-  }
-  .doc-item .fname { font-size: 13px; font-weight: 500; margin-bottom: 4px; word-break: break-word; }
-  .doc-item .meta { display: flex; gap: 8px; align-items: center; font-size: 11px; color: var(--faint); }
-  .doc-item .docid { font-family: 'IBM Plex Mono', monospace; }
 
-  .badge {
-    display: inline-block;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 2px;
-    border: 1px solid;
-    white-space: nowrap;
+/* Integrated image + text storytelling */
+.integrated-story{
+  max-width:1240px;
+  margin:0 auto;
+  padding:20px 28px 110px;
+}
+.story-row{
+  min-height:470px;
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:80px;
+  align-items:center;
+  margin:0 0 75px;
+}
+.story-row.reverse{
+  grid-template-columns:.85fr 1.15fr;
+}
+.story-row.reverse .story-image{order:2}
+.story-row.reverse .story-copy{order:1}
+.story-image{
+  position:relative;
+  height:430px;
+  overflow:hidden;
+  border-radius:2px;
+  border:1px solid var(--photo-border);
+  box-shadow:var(--shadow);
+  background:var(--surface);
+}
+.story-image img{
+  width:100%;
+  height:112%;
+  object-fit:cover;
+  display:block;
+  filter:saturate(.78);
+  transform:scale(1.015);
+  transition:transform 1.4s cubic-bezier(.2,.7,.2,1),filter .7s ease;
+}
+.story-row:hover .story-image img{
+  transform:scale(1.045);
+  filter:saturate(.96);
+}
+.story-fade{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,rgba(8,13,18,.02) 45%,rgba(8,13,18,.48) 100%);
+  pointer-events:none;
+}
+.story-row.reverse .story-fade{
+  background:linear-gradient(270deg,rgba(8,13,18,.02) 45%,rgba(8,13,18,.48) 100%);
+}
+.story-caption{
+  position:absolute;
+  left:20px;
+  bottom:18px;
+  color:#fff;
+  font-size:9px;
+  letter-spacing:.18em;
+  font-weight:600;
+  opacity:.86;
+}
+.story-copy{
+  max-width:430px;
+}
+.story-copy h2{
+  margin:10px 0 18px;
+  font-size:clamp(34px,4vw,50px);
+  line-height:1.02;
+}
+.story-copy p{
+  color:var(--muted);
+  font-size:16px;
+  line-height:1.75;
+  max-width:390px;
+}
+@media(max-width:850px){
+  .story-row,.story-row.reverse{
+    grid-template-columns:1fr;
+    gap:30px;
+    margin-bottom:65px;
   }
-  .badge.uploaded, .badge.extracting { color: var(--muted); border-color: var(--hairline); }
-  .badge.review { color: var(--medium); border-color: var(--medium); background: var(--medium-dim); }
-  .badge.reasoning { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
-  .badge.complete { color: var(--low); border-color: var(--low); background: var(--low-dim); }
-  .badge.failed { color: var(--high); border-color: var(--high); background: var(--high-dim); }
-  .badge.high { color: var(--high); border-color: var(--high); background: var(--high-dim); }
-  .badge.medium { color: var(--medium); border-color: var(--medium); background: var(--medium-dim); }
-  .badge.low { color: var(--low); border-color: var(--low); background: var(--low-dim); }
+  .story-row.reverse .story-image{order:1}
+  .story-row.reverse .story-copy{order:2}
+  .story-image{height:350px}
+}
+@media(prefers-reduced-motion:reduce){
+  .story-image img{transition:none}
+}
 
-  .empty-list { padding: 24px 18px; color: var(--faint); font-size: 12.5px; text-align: center; }
 
-  /* ---------- main ---------- */
-  main.workspace { overflow-y: auto; display: flex; flex-direction: column; }
-  .no-doc {
-    flex: 1; display: flex; align-items: center; justify-content: center;
-    color: var(--faint); font-family: 'Fraunces', serif; font-size: 18px;
-  }
+/* JARD editorial landing system — inspired by the supplied reference */
+#landing{
+  --paper:#f3ece4;
+  --paper-2:#eee5dc;
+  --charcoal:#171517;
+  --soft-ink:#5f5854;
+  background:var(--paper);
+}
+html[data-theme="light"] #landing{
+  --bg:var(--paper);--surface:#faf6f1;--surface2:var(--paper-2);
+  --ink:var(--charcoal);--muted:var(--soft-ink);--line:#d8cec4;
+  --display:var(--charcoal);--blue:#574d47;--blue2:#e8ded5;
+}
+html[data-theme="dark"] #landing{
+  --bg:#0f1113;--surface:#151719;--surface2:#1b1d20;
+  --ink:#f1ece5;--muted:#a9a29b;--line:#302f2e;
+  --display:#f3eee7;
+}
+#landing .site-header{
+  width:100%;height:82px;padding:0 clamp(24px,5vw,72px);
+  border-bottom:1px solid var(--line);box-shadow:none;
+  display:flex;align-items:center;
+}
+#landing .brandmark{width:30px;height:30px;border-radius:50%;background:var(--charcoal);color:#f3ece4}
+html[data-theme="dark"] #landing .brandmark{background:#f1ece5;color:#141618}
+#landing .brand-word{font-family:var(--serif);font-size:23px;letter-spacing:.16em}
+#landing .nav{margin-left:auto;margin-right:28px;gap:30px}
+#landing .nav a{
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);
+  opacity:.78;position:relative;
+}
+#landing .nav a:after{
+  content:"";position:absolute;left:0;right:0;bottom:-7px;height:1px;background:currentColor;
+  transform:scaleX(0);transform-origin:right;transition:transform .3s ease;
+}
+#landing .nav a:hover:after{transform:scaleX(1);transform-origin:left}
+#landing .theme-toggle{
+  width:34px;height:34px;border:1px solid var(--line);background:transparent;color:var(--ink);
+  font-size:15px;margin-right:3px;
+}
+#landing .btn.primary{border-radius:0;padding:10px 18px;letter-spacing:.06em;text-transform:uppercase;font-size:10px}
+#landing .hero{
+  max-width:none;width:100%;min-height:calc(100vh - 82px);padding:8vh clamp(24px,8vw,120px) 10vh;
+  display:grid;grid-template-columns:minmax(0,.88fr) minmax(430px,.92fr);gap:7vw;align-items:center;
+  border-bottom:1px solid var(--line);overflow:hidden;
+}
+#landing .hero-copy{max-width:650px}
+#landing .eyebrow{font-size:10px;letter-spacing:.22em;font-weight:600;color:var(--muted)}
+#landing .hero h1{
+  font-size:clamp(64px,9vw,142px);line-height:.84;letter-spacing:-.055em;
+  margin:22px 0 32px;font-weight:400;
+}
+#landing .hero h1 em{font-style:italic;font-weight:400}
+#landing .hero-copy>p{
+  max-width:440px;font-size:15px;line-height:1.8;color:var(--muted);margin-bottom:30px;
+}
+#landing .hero .actions{display:flex;align-items:center;gap:25px}
+#landing .hero .text-link{border:0;text-transform:uppercase;letter-spacing:.1em;font-size:10px}
+#landing .hero-visual{height:620px}
+#landing .image-card{border:0;box-shadow:none}
+#landing .image-main{
+  right:4%;top:2%;width:69%;height:500px;transform:rotate(1deg);
+}
+#landing .image-main:after{background:linear-gradient(180deg,transparent 55%,rgba(15,13,12,.58))}
+#landing .image-small{left:2%;bottom:20px;width:39%;height:240px;transform:rotate(-3deg)}
+#landing .floating-doc{
+  right:0;top:49%;width:185px;padding:16px;background:var(--surface);
+  border:1px solid var(--line);box-shadow:0 14px 35px rgba(30,25,20,.12);
+}
+#landing .section.white{background:var(--paper-2)}
+#landing .section{
+  padding:120px clamp(24px,8vw,120px);border-bottom:1px solid var(--line);
+}
+#landing .section .container{max-width:1120px}
+#landing .section h2{
+  font-size:clamp(42px,5vw,72px);line-height:.96;font-weight:400;max-width:900px;margin:15px 0 28px;
+}
+#landing .lead{max-width:620px;font-size:16px;line-height:1.8;color:var(--muted)}
+#landing .grid3{gap:1px;background:var(--line);border:1px solid var(--line);margin-top:50px}
+#landing .grid3 .card{background:var(--surface);border:0;border-radius:0;padding:28px}
+#landing .grid3 .card b{font-family:var(--serif);font-size:23px;font-weight:500}
+#landing .workflow{gap:1px;background:var(--line);border:1px solid var(--line);margin-top:45px}
+#landing .workflow .step{border:0;border-radius:0;background:var(--surface);padding:27px}
+#landing .workflow .step strong{font-family:var(--serif);font-size:23px;font-weight:500}
+#landing .architecture{border-radius:0;background:#151719;color:#e8e1d8;border-color:#343230}
+#landing .integrated-story{
+  max-width:none;padding:125px clamp(24px,8vw,120px);
+  background:var(--paper);border-bottom:1px solid var(--line);
+}
+#landing .story-intro{max-width:1120px;margin:0 auto 65px}
+#landing .story-intro h2{font-size:clamp(52px,7vw,100px);line-height:.88;font-weight:400;margin:18px 0}
+#landing .story-intro h2 em{font-style:italic}
+#landing .story-panel{
+  max-width:1120px;height:430px;margin:0 auto 18px;position:relative;overflow:hidden;
+  display:flex;align-items:center;border:1px solid rgba(30,25,20,.12);
+}
+#landing .story-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.18);transition:transform 1.2s ease}
+#landing .story-panel:hover img{transform:scale(1.035)}
+#landing .story-wash{position:absolute;inset:0;background:linear-gradient(90deg,rgba(18,16,15,.72),rgba(18,16,15,.2) 62%,rgba(18,16,15,.08))}
+#landing .story-panel-light .story-wash{background:linear-gradient(90deg,rgba(245,238,230,.94),rgba(245,238,230,.62) 52%,rgba(245,238,230,.14))}
+#landing .story-panel-dark .story-wash{background:linear-gradient(90deg,rgba(10,11,12,.80),rgba(10,11,12,.32) 65%,rgba(10,11,12,.12))}
+#landing .story-number{
+  position:absolute;right:28px;top:24px;font-family:var(--serif);font-size:20px;color:#fff;opacity:.8
+}
+#landing .story-panel-light .story-number{color:#2b2826}
+#landing .story-copy{position:relative;z-index:2;max-width:540px;padding:55px;color:#fff}
+#landing .story-panel-light .story-copy{color:#252220}
+#landing .story-copy h3{font-family:var(--serif);font-size:clamp(34px,4vw,58px);line-height:.96;font-weight:400;margin:14px 0 18px;letter-spacing:-.035em}
+#landing .story-copy p{font-size:15px;line-height:1.75;max-width:440px;color:inherit;opacity:.82}
+#landing footer{background:var(--charcoal);color:#eee7df;border:0}
+@media(max-width:900px){
+  #landing .hero{grid-template-columns:1fr;min-height:auto;padding-top:70px}
+  #landing .hero-visual{height:500px}
+}
+@media(max-width:650px){
+  #landing .site-header{padding:0 18px}.brand-word{font-size:19px}
+  #landing .nav{gap:12px;margin-right:8px}.nav a{font-size:9px}
+  #landing .hero{padding:55px 20px 70px}.hero h1{font-size:64px}
+  #landing .hero-visual{height:390px}.image-main{height:320px}.image-small{height:160px}
+  #landing .floating-doc{display:none}
+  #landing .section,#landing .integrated-story{padding:80px 20px}
+  #landing .story-panel{height:420px}.story-copy{padding:30px}
+}
 
-  .doc-header {
-    padding: 22px 28px 16px;
-    border-bottom: 1px solid var(--hairline);
-    display: flex; align-items: flex-start; gap: 18px;
-  }
-  .doc-header .title {
-    font-family: 'Fraunces', serif;
-    font-size: 22px;
-    font-weight: 500;
-    word-break: break-word;
-  }
-  .doc-header .sub { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
-  .doc-header .sub .mono { color: var(--faint); }
-  .doc-header .actions { margin-left: auto; display: flex; gap: 8px; flex-shrink: 0; }
 
-  nav.tabs {
-    display: flex; gap: 2px; padding: 0 28px;
-    border-bottom: 1px solid var(--hairline);
-    background: var(--surface);
-  }
-  nav.tabs button.tab {
-    border: none; border-bottom: 2px solid transparent;
-    background: transparent; border-radius: 0;
-    padding: 12px 4px; margin-right: 22px;
-    color: var(--muted); font-size: 13px;
-  }
-  nav.tabs button.tab:hover { color: var(--ink); border-color: var(--hairline); }
-  nav.tabs button.tab.active { color: var(--ink); border-color: var(--accent); }
-  nav.tabs button.tab .count {
-    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--faint); margin-left: 5px;
-  }
+/* JARD — single dark theme */
+:root{
+  --bg:#0b1015;
+  --surface:#121920;
+  --surface2:#18222b;
+  --ink:#edf1f3;
+  --muted:#9ca8b1;
+  --line:#29353f;
+  --blue:#9bbfd8;
+  --blue2:#1b2d3b;
+  --green:#61c38d;
+  --greenbg:#11271d;
+  --amber:#e2a45a;
+  --amberbg:#302416;
+  --red:#ef8179;
+  --redbg:#311918;
+  --info:#79a9e3;
+  --shadow:0 18px 50px rgba(0,0,0,.30);
+  --display:#f3eee7;
+  --photo-border:rgba(255,255,255,.11);
+  --serif:"Bodoni Moda","Didot","Bodoni 72","Times New Roman",serif;
+}
+html,body{background:#0b1015!important;color:#edf1f3!important}
+body{font-family:"Inter","Avenir Next","Segoe UI",system-ui,sans-serif}
+#landing{
+  background:#0b1015!important;
+  color:#edf1f3!important;
+  --bg:#0b1015;
+  --surface:#121920;
+  --surface2:#18222b;
+  --ink:#edf1f3;
+  --muted:#9ca8b1;
+  --line:#29353f;
+  --display:#f3eee7;
+  --blue:#9bbfd8;
+  --blue2:#1b2d3b;
+}
+#landing .site-header{
+  background:rgba(18,25,32,.94)!important;
+  border-color:#29353f!important;
+}
+#landing .brandmark{background:#f1ece5!important;color:#121920!important}
+#landing .nav a,#landing .brand-word{color:#edf1f3!important}
+#landing .theme-toggle{display:none!important}
+#landing .btn{background:#121920;color:#edf1f3;border-color:#29353f}
+#landing .btn.primary{background:#e9eef1;color:#111920;border-color:#e9eef1}
+#landing .hero,
+#landing .section,
+#landing .section.white,
+#landing .integrated-story{
+  background:#0b1015!important;
+  color:#edf1f3!important;
+  border-color:#29353f!important;
+}
+#landing .hero h1,
+#landing .section h2,
+#landing .story-intro h2,
+#landing .story-copy h3{color:#f3eee7!important}
+#landing .hero-copy>p,
+#landing .lead,
+#landing .story-copy p,
+#landing .editorial-copy p{color:#9ca8b1!important}
+#landing .grid3,
+#landing .workflow{background:#29353f!important;border-color:#29353f!important}
+#landing .grid3 .card,
+#landing .workflow .step{
+  background:#121920!important;
+  color:#edf1f3!important;
+}
+#landing .story-panel{
+  border-color:#29353f!important;
+}
+#landing .story-panel-light .story-wash{
+  background:linear-gradient(90deg,rgba(10,14,18,.91),rgba(10,14,18,.64) 55%,rgba(10,14,18,.22))!important;
+}
+#landing .story-panel-light .story-copy,
+#landing .story-panel-light .story-number{color:#f3eee7!important}
+#landing footer{background:#070b0f!important;color:#edf1f3!important}
+#landing .eyebrow{color:#9bbfd8!important}
 
-  .tab-panel { padding: 22px 28px 40px; }
-  .tab-panel.hidden { display: none; }
+/* App also stays dark, without theme switching. */
+#app{
+  background:#0b1015!important;
+  color:#edf1f3!important;
+}
+#app .sidebar,#app .topbar,#app .panel,#app .metric,#app .case,
+#app .account-menu,#app .authcontent,#app .card{
+  background:#121920!important;
+  color:#edf1f3!important;
+  border-color:#29353f!important;
+}
+#app .sidebtn{color:#aeb9c3}
+#app .sidebtn:hover,#app .sidebtn.active{background:#1b2d3b;color:#b9d8ec}
+#app .search,#app input,#app select,#app textarea{
+  background:#0e151b!important;color:#edf1f3!important;border-color:#29353f!important;
+}
+#app th{background:#10171d!important;color:#aeb9c3!important}
+#app td{border-color:#29353f!important}
 
-  /* fields table */
-  table.fields { width: 100%; border-collapse: collapse; }
-  table.fields th {
-    text-align: left; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
-    color: var(--faint); font-weight: 500; padding: 8px 10px; border-bottom: 1px solid var(--hairline);
-  }
-  table.fields td { padding: 10px 10px; border-bottom: 1px solid var(--hairline); font-size: 13px; vertical-align: top; }
-  table.fields tr.low-conf td:first-child { border-left: 2px solid var(--medium); }
-  .conf-bar {
-    display: inline-flex; align-items: center; gap: 7px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;
-  }
-  .conf-track { width: 52px; height: 4px; background: var(--hairline); border-radius: 2px; overflow: hidden; }
-  .conf-fill { height: 100%; background: var(--low); }
-  .conf-fill.low { background: var(--medium); }
+/* =====================================================================================
+   INNER APPLICATION REDESIGN — everything below reworks the post-login workspace only.
+   Landing page, auth, and branding above are unchanged.
+   ===================================================================================== */
 
-  .review-row { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
-  .review-row input[type=text] { flex: 1; padding: 5px 8px; font-size: 12px; }
-  .review-row button { padding: 4px 9px; font-size: 11.5px; }
+/* Sidebar: full nav restored + compact enterprise footer */
+#app .sidebar{display:flex;flex-direction:column}
+#app .side-nav{padding:8px 10px;flex:1;overflow-y:auto}
+#app .sidegroup{padding:16px 12px 6px}
+#app .sidebtn{height:38px;margin:1px 0;gap:11px;transition:background .15s ease,color .15s ease,transform .1s ease}
+#app .sidebtn:active{transform:scale(.98)}
+#app .sidebtn .si{width:20px;font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;color:#5f6f7a;flex:none}
+#app .sidebtn.active .si{color:#9fc6df}
+#app .sidebar-foot{padding:10px;border-top:1px solid #29353f;flex:none}
 
-  /* discrepancies */
-  .disc-card, .action-card {
-    border: 1px solid var(--hairline); border-radius: 4px; padding: 14px 16px; margin-bottom: 12px; background: var(--surface);
-  }
-  .disc-card .disc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .disc-card .field-name { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--accent); }
-  .disc-values { display: flex; gap: 18px; margin: 8px 0; }
-  .disc-values .v { flex: 1; }
-  .disc-values .v .label { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 3px; }
-  .disc-values .v .val { font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
-  .disc-card .explain { color: var(--muted); font-size: 12.5px; margin-top: 6px; }
+/* Compact, enterprise account menu */
+#app .account-btn{gap:8px;padding:5px 10px 5px 5px}
+#app .account-menu{width:230px;padding:0;overflow:hidden;transform-origin:top right}
+#app .account-menu.show{animation:menuIn .16s ease}
+@keyframes menuIn{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:none}}
+#app .am-head{padding:14px 16px;border-bottom:1px solid #29353f;display:flex;gap:10px;align-items:center}
+#app .am-head .avatar{width:34px;height:34px;font-size:13px;flex:none}
+#app .am-name{font-weight:650;font-size:13px;line-height:1.3}
+#app .am-org{font-size:11px;color:#9ca8b1}
+#app .am-email{font-size:11.5px;color:#9ca8b1;padding:9px 16px;border-bottom:1px solid #29353f;word-break:break-all}
+#app .am-actions{padding:6px}
+#app .am-actions button{font-size:13px;padding:9px 10px}
 
-  /* case file / linked documents */
-  .case-card {
-    border: 1px solid var(--hairline); border-radius: 4px; padding: 13px 16px; margin-bottom: 10px;
-    background: var(--surface); display: flex; align-items: center; gap: 14px; cursor: pointer;
-    transition: border-color .15s ease;
-  }
-  .case-card:hover { border-color: var(--accent); }
-  .case-card .c-main { flex: 1; min-width: 0; }
-  .case-card .c-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; word-break: break-word; }
-  .case-card .c-meta { font-size: 11.5px; color: var(--faint); }
-  .case-card .c-rel {
-    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--accent);
-    border: 1px solid var(--accent-dim); border-radius: 2px; padding: 3px 8px; white-space: nowrap;
-  }
-  .case-card .c-conf { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--faint); white-space: nowrap; }
+/* Profile modal (read-only — not a settings page) */
+#profileBack .authmodal{display:block;grid-template-columns:none;width:min(360px,100%);padding:28px}
+.profile-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #29353f;font-size:13px}
+.profile-row:last-child{border:0}
 
-  .action-card .a-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .action-card .a-type { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); }
-  .action-card .content { white-space: pre-wrap; font-size: 12.5px; color: var(--ink); background: var(--bg); border: 1px solid var(--hairline); border-radius: 3px; padding: 10px 12px; margin: 8px 0; }
-  .action-card .a-controls { display: flex; gap: 8px; margin-top: 8px; }
+/* Workflow stage tracker */
+.stage-tracker{display:flex;border:1px solid #29353f;border-radius:7px;background:#121920;overflow:hidden;margin-bottom:20px}
+.stage{flex:1;display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:11px;letter-spacing:.04em;color:#5f6f7a;border-right:1px solid #29353f;white-space:nowrap}
+.stage:last-child{border-right:0}
+.stage .sn{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;border:1px solid #29353f;color:#5f6f7a;flex:none}
+.stage.done{color:#6f9782}
+.stage.done .sn{background:#11271d;border-color:#4f8f6c;color:#61c38d}
+.stage.current{color:#edf1f3;font-weight:650}
+.stage.current .sn{background:#1b2d3b;border-color:#5c8aab;color:#9fc6df}
+.stage.future{color:#546069}
 
-  .empty-panel { color: var(--faint); font-size: 13px; padding: 20px 0; }
+/* Dashboard: next best action + needs attention */
+.nba{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 20px}
+.nba-label{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#9fc6df;margin-bottom:6px}
+.nba p{margin:0;font-size:15px}
+.attn-row{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid #29353f}
+.attn-row:last-child{border:0}
+.attn-left{display:flex;align-items:center;gap:10px;font-size:13px}
+.attn-sev{width:6px;height:6px;border-radius:50%;flex:none}
+.attn-sev.high{background:#ef8179}
+.attn-sev.med{background:#e2a45a}
+.attn-sev.low{background:#9bbfd8}
+.btn.sm{padding:6px 11px;font-size:12px}
 
-  /* audit ledger */
-  .ledger { border-left: 1px solid var(--hairline); margin-left: 8px; }
-  .ledger-entry { position: relative; padding: 0 0 20px 22px; }
-  .ledger-entry::before {
-    content: ""; position: absolute; left: -5px; top: 3px; width: 9px; height: 9px;
-    border-radius: 50%; background: var(--bg); border: 2px solid var(--accent);
-  }
-  .ledger-entry .l-top { display: flex; align-items: baseline; gap: 10px; margin-bottom: 3px; }
-  .ledger-entry .l-time { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--faint); }
-  .ledger-entry .l-agent {
-    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em;
-    color: var(--accent); border: 1px solid var(--accent-dim); padding: 1px 6px; border-radius: 2px;
-  }
-  .ledger-entry .l-action { font-size: 13px; font-weight: 500; }
-  .ledger-entry .l-summary { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
-  .ledger-entry .l-summary .k { color: var(--faint); }
+/* Confidence bars in tables */
+.conf-cell{display:inline-flex;align-items:center;gap:8px;font-size:12px}
+.confbar{width:56px;height:5px;border-radius:3px;background:#1c2932;overflow:hidden}
+.confbar>i{display:block;height:100%}
 
-  /* chat */
-  .chat-dock {
-    border-top: 1px solid var(--hairline);
-    background: var(--surface);
-    padding: 14px 28px 18px;
-  }
-  .chat-dock .eyebrow {
-    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--faint); margin-bottom: 8px;
-  }
-  .chat-form { display: flex; gap: 8px; }
-  .chat-form input[type=text] { flex: 1; }
-  .chat-examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
-  .chat-chip {
-    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted);
-    border: 1px solid var(--hairline); border-radius: 12px; padding: 4px 10px;
-    background: transparent; cursor: pointer; transition: border-color .15s ease, color .15s ease;
-  }
-  .chat-chip:hover { border-color: var(--accent); color: var(--ink); }
-  .chat-result { margin-top: 12px; }
-  .chat-result .explanation { font-size: 13px; color: var(--ink); margin-bottom: 8px; }
-  .chat-result .sql-box {
-    font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--accent);
-    background: var(--bg); border: 1px solid var(--hairline); border-radius: 3px; padding: 8px 10px; margin-bottom: 10px;
-    white-space: pre-wrap; word-break: break-all;
-  }
-  .chat-result .sql-error { color: var(--high); }
-  table.chat-rows { width: 100%; border-collapse: collapse; font-size: 12px; }
-  table.chat-rows th { text-align: left; padding: 6px 9px; border-bottom: 1px solid var(--hairline); color: var(--faint); font-family: 'IBM Plex Mono', monospace; font-weight: 500; }
-  table.chat-rows td { padding: 6px 9px; border-bottom: 1px solid var(--hairline); font-family: 'IBM Plex Mono', monospace; }
-  .chat-loading { color: var(--faint); font-size: 12.5px; font-family: 'IBM Plex Mono', monospace; }
+/* Review queue: two-column with guidance side panel */
+.review-layout{display:grid;grid-template-columns:1fr 250px;gap:16px}
+.review-side{background:#121920;border:1px solid #29353f;border-radius:7px;padding:16px;align-self:start}
+.review-side h4{margin:0 0 12px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#9ca8b1}
+.rs-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #29353f;font-size:12.5px}
+.rs-row:last-child{border:0}
+.correct-input{width:100%;padding:9px 10px;border:1px solid #29353f;border-radius:6px;background:#0e161d;color:#edf1f3;margin-top:10px;display:none}
 
-  ::-webkit-scrollbar { width: 9px; height: 9px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--hairline); border-radius: 5px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--faint); }
+/* Case detail */
+.linked-docs{display:flex;gap:10px;flex-wrap:wrap;padding:16px 20px}
+.linked-doc{border:1px solid #29353f;border-radius:6px;padding:8px 12px;font-size:12.5px;background:#0e161d}
+.compare-table td.discrepancy{color:#ef8179;font-weight:650}
+.compare-table td.match{color:#61c38d}
+
+/* Discrepancy filters */
+.filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-chip{border:1px solid #29353f;background:#121920;border-radius:20px;padding:6px 13px;font-size:12px;color:#9ca8b1;transition:border-color .15s,color .15s}
+.filter-chip.active{border-color:#6fa8d6;color:#9fc6df;background:#152634}
+.badge.neutral{background:#18232d;color:#9ca8b1}
+
+/* Actions page */
+.approval-flag{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#e2a45a;border:1px solid #4a3a1e;background:#302416;padding:5px 10px;border-radius:5px;font-weight:650;white-space:nowrap}
+.action-meta-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}
+.email-draft{background:#0e161d;border:1px solid #29353f;border-radius:7px;padding:16px;font-size:13px;line-height:1.75;color:#dbe4ea}
+
+/* Knowledge base — enterprise search, not chat */
+.kb-search{display:flex;gap:8px}
+.kb-search input{flex:1;padding:12px 14px;border:1px solid #29353f;border-radius:6px;background:#0e161d;color:#edf1f3;font-size:14px}
+.kb-sources{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.kb-source{border:1px solid #29353f;border-radius:5px;padding:6px 10px;font-size:11.5px;color:#9ca8b1;font-family:ui-monospace,SFMono-Regular,monospace}
+.dropzone{border:2px dashed var(--line);border-radius:8px;padding:22px;text-align:center;color:var(--muted);cursor:pointer;transition:border-color .15s ease,background .15s ease;margin-bottom:16px}
+.dropzone:hover,.dropzone.drag{border-color:var(--blue);background:var(--blue2);color:var(--ink)}
+.dropzone input{display:none}
+.dropzone .hint{display:block;margin-top:4px;font-size:11.5px;color:var(--muted)}
+.upload-status{font-size:12.5px;color:var(--muted);margin:-6px 0 16px}
+.field-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:11px 0;border-bottom:1px solid var(--line)}
+.field-row:last-child{border:0}
+.queue-item{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.queue-item:last-child{border:0}
+.queue-item:hover{background:var(--surface2)}
+.queue-item.active{background:var(--blue2)}
+.skeleton{padding:60px;text-align:center;color:var(--muted)}
+
+/* Page transition (restrained, respects reduced-motion via the global rule above) */
+.page-enter{animation:pageIn .22s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#app tr{transition:background-color .12s ease}
+#app .panel,#app .metric{transition:border-color .2s ease}
+
+@media(max-width:960px){
+  .review-layout{grid-template-columns:1fr}
+  .stage .stage-label{display:none}
+  .stage{padding:11px 10px}
+}
+@media(max-width:640px){
+  #app .summary{grid-template-columns:1fr 1fr}
+  #app .account-menu{right:-10px;width:210px}
+  .nba{flex-direction:column;align-items:flex-start;gap:12px}
+  .nba button{width:100%}
+}
+
+/* ==========================================================================
+   JARD LANDING — FRONT PAGE POLISH
+   Scoped only to #landing. The inner application remains unchanged.
+   ========================================================================== */
+#landing{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+}
+#landing:before{
+  content:"";
+  position:absolute;
+  inset:82px 0 auto;
+  height:520px;
+  background:
+    radial-gradient(circle at 74% 38%,rgba(116,160,190,.10),transparent 33%),
+    linear-gradient(90deg,transparent 0%,rgba(255,255,255,.015) 50%,transparent 100%);
+  pointer-events:none;
+  z-index:-1;
+}
+#landing .site-header{
+  padding-left:clamp(22px,5vw,72px);
+  padding-right:clamp(22px,5vw,72px);
+  background:rgba(18,25,32,.92)!important;
+  backdrop-filter:blur(16px);
+}
+#landing .brand{gap:12px}
+#landing .brandmark{
+  width:32px;height:32px;
+  border-radius:7px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08);
+}
+#landing .brand-word{
+  font-size:21px;
+  letter-spacing:.18em;
+}
+#landing .nav{
+  gap:34px;
+}
+#landing .nav a{
+  font-size:10px;
+  letter-spacing:.16em;
+}
+#landing .header-actions .btn{
+  min-width:84px;
+}
+#landing .hero{
+  position:relative;
+  min-height:calc(100vh - 82px);
+  padding-top:clamp(70px,9vh,112px);
+  padding-bottom:clamp(70px,10vh,120px);
+}
+#landing .hero-copy{
+  position:relative;
+  z-index:5;
+}
+#landing .hero .eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+}
+#landing .hero .eyebrow:before{
+  content:"";
+  width:28px;height:1px;
+  background:var(--blue);
+  opacity:.8;
+}
+#landing .hero h1{
+  max-width:720px;
+  text-wrap:balance;
+}
+#landing .hero-copy>p{
+  max-width:520px;
+  font-size:16px;
+  line-height:1.85;
+}
+#landing .hero .actions{
+  margin-top:34px;
+}
+#landing .hero .btn.primary{
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+  transition:transform .2s ease,background .2s ease;
+}
+#landing .hero .btn.primary:hover{
+  transform:translateY(-1px);
+}
+#landing .hero-visual{
+  height:620px;
+}
+#landing .image-main{
+  box-shadow:0 26px 70px rgba(0,0,0,.32);
+}
+#landing .image-small{
+  box-shadow:0 18px 48px rgba(0,0,0,.34);
+}
+#landing .floating-doc{
+  width:214px;
+  padding:17px 18px;
+  box-shadow:0 22px 50px rgba(0,0,0,.34);
+}
+#landing .hero-float-meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:13px;
+  padding-top:11px;
+  border-top:1px solid var(--line);
+  font-size:10px;
+  color:var(--muted);
+}
+#landing .hero-float-meta strong{
+  color:var(--green);
+  font-size:12px;
+}
+#landing .hero-signal{
+  position:absolute;
+  z-index:6;
+  right:2%;
+  bottom:1%;
+  width:255px;
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  padding:12px 14px;
+  background:rgba(18,25,32,.94);
+  border:1px solid var(--line);
+  box-shadow:0 18px 45px rgba(0,0,0,.28);
+}
+#landing .hero-signal-dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  margin-top:5px;
+  background:var(--green);
+  box-shadow:0 0 0 3px rgba(97,195,141,.10);
+  flex:none;
+}
+#landing .hero-signal b{
+  display:block;
+  font-size:11px;
+  letter-spacing:.01em;
+}
+#landing .hero-signal small{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.45;
+}
+#landing .landing-rail{
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  background:#0e151b;
+}
+#landing .landing-rail-inner{
+  max-width:1240px;
+  margin:0 auto;
+  padding:0 28px;
+  min-height:82px;
+  display:flex;
+  align-items:center;
+  gap:30px;
+}
+#landing .rail-label{
+  flex:none;
+  font-size:9px;
+  letter-spacing:.18em;
+  color:#6f7e89;
+  white-space:nowrap;
+}
+#landing .rail-stages{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-width:0;
+}
+#landing .rail-stage{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#778692;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+#landing .rail-stage b{
+  width:22px;height:22px;
+  border:1px solid #35434e;
+  display:grid;
+  place-items:center;
+  font-size:9px;
+  font-weight:600;
+  color:#778692;
+}
+#landing .rail-stage.active{
+  color:#c7dbea;
+}
+#landing .rail-stage.active b{
+  background:#1b2d3b;
+  border-color:#5c809b;
+  color:#b9d7ec;
+}
+#landing .rail-line{
+  flex:1;
+  height:1px;
+  min-width:16px;
+  background:#29353f;
+}
+#landing .section{
+  position:relative;
+}
+#landing .section .container{
+  position:relative;
+}
+#landing .section h2{
+  max-width:920px;
+}
+#landing .grid3{
+  margin-top:52px;
+}
+#landing .grid3 .card{
+  min-height:175px;
+  padding:30px;
+  position:relative;
+}
+#landing .grid3 .card:before{
+  content:"";
+  position:absolute;
+  top:0;left:0;
+  width:28px;height:1px;
+  background:#5f7f96;
+  opacity:.75;
+}
+#landing .grid3 .card b{
+  font-size:24px;
+}
+#landing .grid3 .card p{
+  line-height:1.7;
+  max-width:330px;
+}
+#landing .integrated-story{
+  background:#0d141a!important;
+}
+#landing .story-intro{
+  padding-bottom:10px;
+}
+#landing .story-intro h2{
+  max-width:850px;
+}
+#landing .story-panel{
+  box-shadow:0 20px 55px rgba(0,0,0,.20);
+}
+#landing .story-copy{
+  padding:60px;
+}
+#landing .story-copy .eyebrow{
+  color:#b3cde0!important;
+}
+#landing .architecture{
+  box-shadow:0 16px 45px rgba(0,0,0,.20);
+}
+#landing footer{
+  padding-top:42px;
+  padding-bottom:42px;
+}
+@media(max-width:980px){
+  #landing .hero{
+    grid-template-columns:1fr;
+  }
+  #landing .hero-copy{
+    max-width:720px;
+  }
+  #landing .hero-visual{
+    height:540px;
+    max-width:720px;
+    width:100%;
+    margin:0 auto;
+  }
+  #landing .landing-rail-inner{
+    padding-top:18px;
+    padding-bottom:18px;
+    display:block;
+  }
+  #landing .rail-label{
+    display:block;
+    margin-bottom:14px;
+  }
+}
+@media(max-width:650px){
+  #landing .site-header{
+    height:72px;
+  }
+  #landing .nav{
+    display:none;
+  }
+  #landing .hero{
+    padding:64px 20px 68px;
+  }
+  #landing .hero h1{
+    font-size:clamp(58px,17vw,84px);
+  }
+  #landing .hero-copy>p{
+    font-size:14px;
+  }
+  #landing .hero-visual{
+    height:390px;
+  }
+  #landing .image-main{
+    width:76%;
+    height:320px;
+    right:3%;
+  }
+  #landing .image-small{
+    width:43%;
+    height:165px;
+    left:0;
+    bottom:8px;
+  }
+  #landing .floating-doc{
+    width:174px;
+    right:-2px;
+    top:52%;
+    padding:13px;
+  }
+  #landing .hero-signal{
+    display:none;
+  }
+  #landing .rail-stages{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px 8px;
+  }
+  #landing .rail-line{
+    display:none;
+  }
+  #landing .rail-stage{
+    font-size:8px;
+  }
+  #landing .rail-stage b{
+    width:20px;height:20px;
+  }
+  #landing .section,#landing .integrated-story{
+    padding-left:20px;
+    padding-right:20px;
+  }
+  #landing .story-panel{
+    height:430px;
+  }
+  #landing .story-copy{
+    padding:30px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #landing .hero .btn.primary{transition:none}
+}
+
+
+/* --------------------------------------------------------------------------
+   JARD FRONT-PAGE MOTION SYSTEM — restrained, accessible, no app changes
+   -------------------------------------------------------------------------- */
+#landing .reveal-on-scroll{opacity:0;transform:translateY(22px);transition:opacity .75s cubic-bezier(.2,.7,.2,1),transform .75s cubic-bezier(.2,.7,.2,1)}
+#landing .reveal-on-scroll.is-visible{opacity:1;transform:none}
+#landing .reveal-stagger > *{opacity:0;transform:translateY(16px);transition:opacity .65s cubic-bezier(.2,.7,.2,1),transform .65s cubic-bezier(.2,.7,.2,1)}
+#landing .reveal-stagger.is-visible > *{opacity:1;transform:none}
+#landing .reveal-stagger.is-visible > *:nth-child(2){transition-delay:.06s}
+#landing .reveal-stagger.is-visible > *:nth-child(3){transition-delay:.12s}
+#landing .reveal-stagger.is-visible > *:nth-child(4){transition-delay:.18s}
+#landing .reveal-stagger.is-visible > *:nth-child(5){transition-delay:.24s}
+#landing .reveal-stagger.is-visible > *:nth-child(6){transition-delay:.30s}
+#landing .hero-copy > *{animation:heroIn .8s cubic-bezier(.2,.7,.2,1) both}
+#landing .hero-copy > *:nth-child(2){animation-delay:.08s}
+#landing .hero-copy > *:nth-child(3){animation-delay:.16s}
+#landing .hero-copy > *:nth-child(4){animation-delay:.24s}
+#landing .hero-visual{animation:visualIn 1s cubic-bezier(.2,.7,.2,1) .12s both}
+#landing .landing-rail{position:relative}
+#landing .landing-rail:after{content:"";position:absolute;left:0;top:0;width:0;height:1px;background:#6f9cba;animation:railProgress 1.5s cubic-bezier(.2,.7,.2,1) .35s forwards}
+#landing .rail-stage{transition:color .3s ease,transform .3s ease}
+#landing .rail-stage:hover{transform:translateY(-2px);color:#c7dbea}
+#landing .grid3 .card,#landing .workflow .step{transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s ease,background-color .35s ease,box-shadow .35s ease}
+#landing .grid3 .card:hover,#landing .workflow .step:hover{transform:translateY(-5px);box-shadow:0 14px 30px rgba(0,0,0,.18)}
+#landing .image-card img{transition:transform 1.1s cubic-bezier(.2,.7,.2,1),filter .8s ease}
+#landing .image-main:hover img{transform:scale(1.035)}
+#landing .image-small:hover img{transform:scale(1.045)}
+#landing .hero-signal{animation:signalIn .8s cubic-bezier(.2,.7,.2,1) .75s both}
+@keyframes heroIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes visualIn{from{opacity:0;transform:translateX(20px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes signalIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes railProgress{to{width:100%}}
+@media(prefers-reduced-motion:reduce){
+  #landing .hero-copy > *,#landing .hero-visual,#landing .hero-signal{animation:none!important}
+  #landing .landing-rail:after{animation:none!important;width:100%}
+  #landing .reveal-on-scroll,#landing .reveal-stagger > *{opacity:1!important;transform:none!important;transition:none!important}
+}
+
 </style>
 </head>
 <body>
-
-<div class="tricolour-strip"><span class="saffron"></span><span class="white"></span><span class="green"></span></div>
-
-<svg class="chakra-watermark" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <circle cx="300" cy="300" r="280" fill="none" stroke="currentColor" stroke-width="6"/>
-  <circle cx="300" cy="300" r="26" fill="none" stroke="currentColor" stroke-width="5"/>
-  <circle cx="300" cy="300" r="6" fill="currentColor"/>
-  <line x1="300.0" y1="274.0" x2="300.0" y2="40.0" stroke="currentColor" stroke-width="5"/>
-  <line x1="306.7" y1="274.9" x2="367.3" y2="48.9" stroke="currentColor" stroke-width="5"/>
-  <line x1="313.0" y1="277.5" x2="430.0" y2="74.8" stroke="currentColor" stroke-width="5"/>
-  <line x1="318.4" y1="281.6" x2="483.8" y2="116.2" stroke="currentColor" stroke-width="5"/>
-  <line x1="322.5" y1="287.0" x2="525.2" y2="170.0" stroke="currentColor" stroke-width="5"/>
-  <line x1="325.1" y1="293.3" x2="551.1" y2="232.7" stroke="currentColor" stroke-width="5"/>
-  <line x1="326.0" y1="300.0" x2="560.0" y2="300.0" stroke="currentColor" stroke-width="5"/>
-  <line x1="325.1" y1="306.7" x2="551.1" y2="367.3" stroke="currentColor" stroke-width="5"/>
-  <line x1="322.5" y1="313.0" x2="525.2" y2="430.0" stroke="currentColor" stroke-width="5"/>
-  <line x1="318.4" y1="318.4" x2="483.8" y2="483.8" stroke="currentColor" stroke-width="5"/>
-  <line x1="313.0" y1="322.5" x2="430.0" y2="525.2" stroke="currentColor" stroke-width="5"/>
-  <line x1="306.7" y1="325.1" x2="367.3" y2="551.1" stroke="currentColor" stroke-width="5"/>
-  <line x1="300.0" y1="326.0" x2="300.0" y2="560.0" stroke="currentColor" stroke-width="5"/>
-  <line x1="293.3" y1="325.1" x2="232.7" y2="551.1" stroke="currentColor" stroke-width="5"/>
-  <line x1="287.0" y1="322.5" x2="170.0" y2="525.2" stroke="currentColor" stroke-width="5"/>
-  <line x1="281.6" y1="318.4" x2="116.2" y2="483.8" stroke="currentColor" stroke-width="5"/>
-  <line x1="277.5" y1="313.0" x2="74.8" y2="430.0" stroke="currentColor" stroke-width="5"/>
-  <line x1="274.9" y1="306.7" x2="48.9" y2="367.3" stroke="currentColor" stroke-width="5"/>
-  <line x1="274.0" y1="300.0" x2="40.0" y2="300.0" stroke="currentColor" stroke-width="5"/>
-  <line x1="274.9" y1="293.3" x2="48.9" y2="232.7" stroke="currentColor" stroke-width="5"/>
-  <line x1="277.5" y1="287.0" x2="74.8" y2="170.0" stroke="currentColor" stroke-width="5"/>
-  <line x1="281.6" y1="281.6" x2="116.2" y2="116.2" stroke="currentColor" stroke-width="5"/>
-  <line x1="287.0" y1="277.5" x2="170.0" y2="74.8" stroke="currentColor" stroke-width="5"/>
-  <line x1="293.3" y1="274.9" x2="232.7" y2="48.9" stroke="currentColor" stroke-width="5"/>
-</svg>
-
-<div class="shell">
-  <header class="top">
-    <div class="mark">CASE_REGISTRY<span class="stamp">office copy</span></div>
-    <div class="tagline">document intelligence for citizen case files — extraction · reasoning · action · audit</div>
-    <div class="spacer"></div>
-    <div class="threshold" id="thresholdBadge"></div>
-  </header>
-
-  <aside class="registry">
-    <div class="registry-head">
-      <div class="eyebrow">Intake</div>
-      <label class="dropzone" id="dropzone">
-        <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.tiff,.bmp,.txt" multiple>
-        <div>Drop scanned certificates, forms or receipts — or click to upload
-          <span class="hint">Multiple files supported</span>
-        </div>
-      </label>
-      <div class="upload-status" id="uploadStatus"></div>
+<div id="landing" class="landing">
+<header class="site-header">
+<a class="brand" href="#"><span class="brandmark">J</span><span class="brand-word">JARD</span></a>
+<nav class="nav"><a href="#about">About Us</a><a href="#workflow">How It Works</a></nav>
+<div class="header-actions">
+<button class="btn primary" onclick="openAuth('signin')">Sign In</button>
+</div>
+</header>
+<section class="hero">
+<div class="hero-copy">
+<div class="eyebrow">DOCUMENT INTELLIGENCE PLATFORM</div>
+<h1>Clarity across<br><em>every document.</em></h1>
+<p>JARD turns complex documents into structured, reviewable intelligence — connecting evidence, confidence and context while keeping people in control of every decision.</p>
+<div class="actions"><button class="btn primary" onclick="openAuth('signin')">Sign In</button><a class="text-link" href="#workflow">See how it works <span>↗</span></a></div>
+</div>
+<div class="hero-visual" aria-label="Document intelligence workspace">
+  <div class="image-card image-main">
+    <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1400&q=85" alt="Professional reviewing documents at a desk">
+    <div class="image-label"><span>DOCUMENT REVIEW</span><b>Verified information</b></div>
+  </div>
+  <div class="image-card image-small">
+    <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=85" alt="Modern professional workspace">
+    <div class="status-chip"><span class="status-dot"></span> Review complete</div>
+  </div>
+  <div class="floating-doc">
+    <div class="small muted">CASE · 2026-041</div><b>3 documents linked</b>
+    <div class="mini-line"><span></span><span></span><span></span></div>
+    <div class="hero-float-meta"><span>Confidence</span><strong>98.4%</strong></div>
+  </div>
+  <div class="hero-signal">
+    <span class="hero-signal-dot"></span>
+    <div><b>Human review enabled</b><small>Low-confidence fields are routed before action.</small></div>
+  </div>
+</div>
+</section>
+<section class="landing-rail" aria-label="JARD processing workflow">
+  <div class="landing-rail-inner">
+    <div class="rail-label">CONTROLLED WORKFLOW</div>
+    <div class="rail-stages">
+      <span class="rail-stage active"><b>01</b> Upload</span>
+      <span class="rail-line"></span>
+      <span class="rail-stage"><b>02</b> Extract</span>
+      <span class="rail-line"></span>
+      <span class="rail-stage"><b>03</b> Review</span>
+      <span class="rail-line"></span>
+      <span class="rail-stage"><b>04</b> Compare</span>
+      <span class="rail-line"></span>
+      <span class="rail-stage"><b>05</b> Approve</span>
+      <span class="rail-line"></span>
+      <span class="rail-stage"><b>06</b> Audit</span>
     </div>
-    <div class="doc-list" id="docList">
-      <div class="empty-list">No documents yet.</div>
+  </div>
+</section>
+<section id="about" class="section white"><div class="container">
+<div class="eyebrow">About JARD</div>
+<h2>Document intelligence, built for accountable decisions.</h2>
+<p class="lead">JARD processes documents, extracts structured information, identifies uncertainty and connects related documents so teams can review discrepancies before taking action.</p>
+<div class="grid3">
+<div class="card"><b>Extract</b><p class="muted">Turn PDFs and scanned documents into structured fields and tables.</p></div>
+<div class="card"><b>Verify</b><p class="muted">Use confidence thresholds to route uncertain information for human review.</p></div>
+<div class="card"><b>Decide</b><p class="muted">Compare related documents, propose actions and retain an audit trail.</p></div>
+</div></div></section>
+
+<section class="integrated-story" aria-label="How JARD works">
+  <div class="story-intro">
+    <div class="eyebrow">HOW JARD WORKS</div>
+    <h2>From document<br><em>to decision.</em></h2>
+  </div>
+
+  <article class="story-panel">
+    <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1600&q=80" alt="" aria-hidden="true">
+    <div class="story-wash"></div>
+    <div class="story-number">01</div>
+    <div class="story-copy">
+      <div class="eyebrow">EXTRACT</div>
+      <h3>Make information usable.</h3>
+      <p>JARD turns PDFs and scanned documents into structured fields, tables and relationships while retaining the source context.</p>
     </div>
-  </aside>
+  </article>
 
-  <main class="workspace">
-    <div class="no-doc" id="noDocMsg">Select or upload a document to open its case file.</div>
+  <article class="story-panel story-panel-light">
+    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=80" alt="" aria-hidden="true">
+    <div class="story-wash"></div>
+    <div class="story-number">02</div>
+    <div class="story-copy">
+      <div class="eyebrow">VERIFY</div>
+      <h3>Let uncertainty ask for attention.</h3>
+      <p>Confidence checks route uncertain information to a person for confirmation or correction before it moves forward.</p>
+    </div>
+  </article>
 
-    <div id="docView" style="display:none; flex:1; display:flex; flex-direction:column;">
-      <div class="doc-header">
-        <div>
-          <div class="title" id="docTitle">—</div>
-          <div class="sub" id="docSub">—</div>
-        </div>
-        <div class="actions" id="docActions"></div>
+  <article class="story-panel story-panel-dark">
+    <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80" alt="" aria-hidden="true">
+    <div class="story-wash"></div>
+    <div class="story-number">03</div>
+    <div class="story-copy">
+      <div class="eyebrow">CONNECT</div>
+      <h3>See the relationship between documents.</h3>
+      <p>JARD compares related documents, surfaces discrepancies and prepares controlled actions for human approval.</p>
+    </div>
+  </article>
+</section>
+<section class="section white"><div class="container"><div class="eyebrow">The problem</div><h2>Documents are where decisions begin.</h2><p class="lead">Important information is often buried in unstructured files, scanned pages and related documents.</p><div class="grid3"><div class="card"><b>Unstructured information</b><p class="muted">Important fields can be buried in PDFs, scans and tables.</p></div><div class="card"><b>Documents are connected</b><p class="muted">An invoice rarely exists alone. Related documents must be considered together.</p></div><div class="card"><b>Decisions need accountability</b><p class="muted">Uncertain results and proposed actions need review and traceability.</p></div></div></div></section>
+<section id="workflow" class="section"><div class="container"><div class="eyebrow">How JARD works</div><h2>From document processing to document intelligence.</h2><p class="lead">JARD combines extraction, verification, reasoning and controlled action proposals.</p><div class="workflow"><div class="step"><div class="eyebrow">01</div><strong>Ingestion</strong><span class="muted small">PDF text extraction and OCR for scanned documents.</span></div><div class="step"><div class="eyebrow">02</div><strong>Extraction</strong><span class="muted small">Convert document content into structured fields and tables.</span></div><div class="step"><div class="eyebrow">03</div><strong>Confidence Gate</strong><span class="muted small">Route uncertain fields to human review.</span></div><div class="step"><div class="eyebrow">04</div><strong>Reasoning</strong><span class="muted small">Compare related documents and identify discrepancies.</span></div></div><div class="workflow"><div class="step"><div class="eyebrow">05</div><strong>Action Proposal</strong><span class="muted small">Prepare a suggested response or task.</span></div><div class="step"><div class="eyebrow">06</div><strong>Human Approval</strong><span class="muted small">No consequential action is sent without approval.</span></div><div class="step"><div class="eyebrow">07</div><strong>Audit Trail</strong><span class="muted small">Record important processing and decision events.</span></div><div class="step"><div class="eyebrow">08</div><strong>Knowledge Query</strong><span class="muted small">Query accumulated document intelligence through Exasol.</span></div></div></div></section>
+<section class="section white"><div class="container"><div class="eyebrow">Exasol data layer</div><h2>A unified data layer for document intelligence.</h2><p class="lead">Exasol keeps the document intelligence and audit trail in one system of record.</p><div class="architecture"><div class="archline">Documents → JARD Processing → Structured Information → EXASOL / DOC_INTEL
+                                           ↓
+                         Reasoning · Analytics · Knowledge Queries
+
+Agent identity  → controlled read/write operations
+Chat identity   → read-only access → SELECT-only queries</div></div></div></section>
+<section id="security" class="section"><div class="container"><div class="eyebrow">Control & security</div><h2>Designed for controlled automation.</h2><div class="grid3"><div class="card"><b>Read-only knowledge queries</b><p class="muted">Natural-language knowledge queries use a dedicated read-only database identity.</p></div><div class="card"><b>Human approval</b><p class="muted">Generated actions remain proposals until a person approves them.</p></div><div class="card"><b>Traceable decisions</b><p class="muted">Important extraction, review, reasoning and action events are recorded in the audit trail.</p></div></div></div></section>
+<section id="usecases" class="section white"><div class="container"><div class="eyebrow">Use cases</div><h2>Built for document-heavy organizations.</h2><div class="grid3"><div class="card"><b>Government & public services</b><p class="muted">Process applications, certificates and supporting documents.</p></div><div class="card"><b>Procurement</b><p class="muted">Compare invoices, purchase orders and contracts.</p></div><div class="card"><b>Finance</b><p class="muted">Review financial documents and identify inconsistencies.</p></div><div class="card"><b>Legal</b><p class="muted">Compare agreements and identify conflicting terms.</p></div><div class="card"><b>Enterprise operations</b><p class="muted">Process large collections of internal documents.</p></div></div></div></section>
+<section id="technology" class="section"><div class="container"><div class="eyebrow">Technology</div><h2>Built around a practical processing pipeline.</h2><p class="lead">The platform uses the technologies present in the JARD repository.</p><div class="grid3"><div class="card"><b>Application</b><p class="muted">Python · Flask · pytest</p></div><div class="card"><b>Data</b><p class="muted">Exasol Personal Local · pyexasol</p></div><div class="card"><b>Document processing</b><p class="muted">pypdf · pdf2image · Tesseract OCR</p></div><div class="card"><b>AI reasoning</b><p class="muted">Claude-based extraction, reasoning and knowledge querying.</p></div></div></div></section>
+
+<footer><div class="footerin"><div><b>JARD</b><div class="small">Document Intelligence Platform</div></div><div class="small">Exasol AI Build Challenge 2026 · Demo interface</div></div></footer>
+</div>
+
+<div id="app" class="app">
+<aside class="sidebar">
+  <div class="sidebrand"><span class="brandmark">J</span><span class="brandtext" style="margin-left:10px;font-weight:750">JARD</span></div>
+  <nav class="side-nav">
+    <div class="sidegroup">Pipeline</div>
+    <button class="sidebtn active" data-page="dashboard" onclick="show('dashboard')"><span class="si">◆</span><span class="label">Dashboard</span></button>
+    <button class="sidebtn" data-page="documents" onclick="show('documents')"><span class="si">01</span><span class="label">Documents</span></button>
+    <button class="sidebtn" data-page="cases" onclick="show('cases')"><span class="si">02</span><span class="label">Cases</span></button>
+    <button class="sidebtn" data-page="review" onclick="show('review')"><span class="si">03</span><span class="label">Review Queue</span></button>
+    <div class="sidegroup">Oversight</div>
+    <button class="sidebtn" data-page="discrepancies" onclick="show('discrepancies')"><span class="si">04</span><span class="label">Discrepancies</span></button>
+    <button class="sidebtn" data-page="actions" onclick="show('actions')"><span class="si">05</span><span class="label">Actions</span></button>
+    <button class="sidebtn" data-page="audit" onclick="show('audit')"><span class="si">06</span><span class="label">Audit Log</span></button>
+    <button class="sidebtn" data-page="knowledge" onclick="show('knowledge')"><span class="si">07</span><span class="label">Knowledge Base</span></button>
+  </nav>
+  <div class="sidebar-foot"><button class="sidebtn" onclick="closeApp()"><span class="si">←</span><span class="label">Back to site</span></button></div>
+</aside>
+
+<div class="topbar">
+  <input id="globalSearch" class="search" placeholder="Search documents, cases or fields…">
+  <div class="account-wrap">
+    <button class="account-btn" onclick="toggleAccount()">
+      <span class="avatar" id="avatar">G</span><span id="accountName" class="small">Guest</span><span class="small muted">⌄</span>
+    </button>
+    <div class="account-menu" id="accountMenu">
+      <div class="am-head">
+        <span class="avatar" id="avatarMenu">G</span>
+        <div><div class="am-name" id="menuName">Guest</div><div class="am-org" id="menuOrg">JARD Workspace</div></div>
       </div>
-
-      <nav class="tabs">
-        <button class="tab active" data-tab="fields">Fields<span class="count" id="countFields"></span></button>
-        <button class="tab" data-tab="case">Case File<span class="count" id="countCase"></span></button>
-        <button class="tab" data-tab="discrepancies">Discrepancies &amp; Actions<span class="count" id="countDisc"></span></button>
-        <button class="tab" data-tab="audit">Audit Timeline<span class="count" id="countAudit"></span></button>
-      </nav>
-
-      <div class="tab-panel" id="panel-fields"></div>
-      <div class="tab-panel hidden" id="panel-case"></div>
-      <div class="tab-panel hidden" id="panel-discrepancies"></div>
-      <div class="tab-panel hidden" id="panel-audit"></div>
-
-      <div style="flex:1"></div>
+      <div class="am-email" id="menuEmail">guest@example.com</div>
+      <div class="am-actions">
+        <button onclick="toggleAccount();openProfile()">View Profile</button>
+        <button class="logout" onclick="logout()">Log Out</button>
+      </div>
     </div>
+  </div>
+</div>
 
-    <div class="chat-dock">
-      <div class="eyebrow">Ask the registry</div>
-      <form class="chat-form" id="chatForm">
-        <input type="text" id="chatInput" placeholder="e.g. Show all welfare applicants earning below ₹2,00,000">
-        <button type="submit" class="primary">Ask</button>
+<main class="main" id="main"></main>
+</div>
+
+<!-- Sign in / Sign up -->
+<div id="authBack" class="authback" onclick="if(event.target===this)closeAuth()">
+  <div class="authmodal">
+    <div class="authphoto" style="background-image:url('https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=85')"></div>
+    <div class="authcontent">
+      <button class="authclose" onclick="closeAuth()">×</button>
+      <div class="eyebrow">JARD PLATFORM</div>
+      <h2 id="authTitle">Sign in</h2>
+      <p id="authSub">Access your document intelligence workspace.</p>
+      <div class="auth-tabs">
+        <button id="tabSignin" class="auth-tab active" onclick="setAuthMode('signin')">Sign In</button>
+        <button id="tabSignup" class="auth-tab" onclick="setAuthMode('signup')">Create Account</button>
+      </div>
+      <form id="authForm" class="authform" onsubmit="submitAuth(event)">
+        <div id="nameFields" class="hidden">
+          <label>Full name</label><input id="fullName" autocomplete="name" placeholder="Your name">
+          <label>Organization</label><input id="orgName" autocomplete="organization" placeholder="Organization">
+        </div>
+        <label>Work email</label><input id="email" type="email" autocomplete="email" placeholder="name@organization.com" required>
+        <label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required minlength="6">
+        <button class="btn primary" style="width:100%;margin-top:20px" id="authSubmit">Sign In</button>
       </form>
-      <div class="chat-examples" id="chatExamples"></div>
-      <div class="chat-result" id="chatResult"></div>
+      <div id="authNote" class="small muted" style="margin-top:14px">Prototype access · authentication is currently UI-only.</div>
     </div>
-  </main>
+  </div>
+</div>
+
+<!-- Read-only profile view (no Settings page) -->
+<div id="profileBack" class="authback" onclick="if(event.target===this)closeProfile()">
+  <div class="authmodal">
+    <button class="authclose" onclick="closeProfile()">×</button>
+    <div class="eyebrow">Account</div>
+    <h2 style="margin:6px 0 16px">Your profile</h2>
+    <div class="profile-row"><span class="muted">Name</span><b id="profName">Guest</b></div>
+    <div class="profile-row"><span class="muted">Email</span><b id="profEmail">—</b></div>
+    <div class="profile-row"><span class="muted">Workspace</span><b id="profOrg">JARD Workspace</b></div>
+    <div class="profile-row"><span class="muted">Role</span><b>Reviewer</b></div>
+    <button class="btn" style="width:100%;margin-top:18px" onclick="closeProfile()">Close</button>
+  </div>
 </div>
 
 <script>
-const API = "";
-let config = { confidence_threshold: 0.8 };
-let documents = [];
-let selectedDocId = null;
-let activeTab = "fields";
-
-function esc(s) {
-  if (s === null || s === undefined) return "";
-  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* =====================================================================================
+   Stage tracker — shown at the top of the pages that sit on the linear pipeline.
+   Everything else (dashboard, discrepancies filter view, knowledge base) skips it since
+   it isn't a single point on the UPLOAD→AUDIT line.
+   ===================================================================================== */
+const STAGES = [
+  {key:'upload',  label:'UPLOAD'},
+  {key:'extract', label:'EXTRACT'},
+  {key:'review',  label:'REVIEW'},
+  {key:'compare', label:'COMPARE'},
+  {key:'approve', label:'APPROVE'},
+  {key:'audit',   label:'AUDIT'},
+];
+function stageTracker(currentKey){
+  const idx = STAGES.findIndex(s=>s.key===currentKey);
+  return `<div class="stage-tracker">${STAGES.map((s,i)=>{
+    const cls = i<idx ? 'done' : i===idx ? 'current' : 'future';
+    return `<div class="stage ${cls}"><span class="sn">${i<idx?'✓':i+1}</span><span class="stage-label">${s.label}</span></div>`;
+  }).join('')}</div>`;
 }
-function fmtTime(ts) {
-  if (!ts) return "";
-  try { return new Date(ts).toLocaleString(undefined, {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"}); }
-  catch { return ts; }
-}
-function shortId(id) { return id ? id.slice(0, 8) : ""; }
-
-async function api(path, opts) {
-  const res = await fetch(API + path, opts);
-  const isJson = (res.headers.get("content-type") || "").includes("application/json");
-  const body = isJson ? await res.json() : null;
-  if (!res.ok) throw new Error((body && body.error) || `Request failed (${res.status})`);
-  return body;
-}
-
-/* ---------------- config + document list ---------------- */
-
-async function loadConfig() {
-  try {
-    config = await api("/api/config");
-    document.getElementById("thresholdBadge").textContent =
-      `confidence gate ≥ ${config.confidence_threshold}`;
-  } catch (e) { /* fine to run with the default */ }
+function confBar(v){
+  const pct = Math.round(v*100);
+  const color = v>=0.9 ? 'var(--green)' : v>=0.75 ? 'var(--amber)' : 'var(--red)';
+  return `<span class="conf-cell"><span class="confbar"><i style="width:${pct}%;background:${color}"></i></span>${pct}%</span>`;
 }
 
-async function loadDocuments() {
-  let docs;
-  try { docs = await api("/api/documents"); }
-  catch (e) { return; }
-  documents = docs;
-  renderDocList();
+/* =====================================================================================
+   Backend wiring. Same-origin Flask API (see api/routes.py) — no base URL needed.
+   SNAPSHOT is a cached fan-out over the per-document endpoints (there's no global
+   /api/discrepancies or /api/actions list, only per-document ones, so we assemble
+   the cross-document views client-side and dedupe by id). Cache is invalidated after
+   any write (upload, review, decide) via loadSnapshot(true).
+   ===================================================================================== */
+let SNAPSHOT = null;
+let ACTIVE_DOC_ID = null;   // last-opened case/document, used by cases()/review()/audit() when no id is passed
+
+async function apiGet(path){
+  const res = await fetch(path);
+  if(!res.ok) throw new Error(`${path} → ${res.status}`);
+  return res.json();
+}
+async function apiPost(path, body){
+  const res = await fetch(path, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body||{})});
+  const payload = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(payload.error || `${path} → ${res.status}`);
+  return payload;
+}
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function currentUser(){ return localStorage.getItem('jardName') || 'reviewer'; }
+function timeAgo(iso){
+  if(!iso) return '—';
+  const d = new Date(iso.replace(' ','T'));
+  if(isNaN(d)) return iso;
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  const yest = new Date(now); yest.setDate(now.getDate()-1);
+  if(sameDay) return `Today, ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+  if(d.toDateString() === yest.toDateString()) return 'Yesterday';
+  return d.toLocaleDateString();
+}
+function caseLabel(docId){ return docId ? `#${docId.slice(0,8).toUpperCase()}` : '—'; }
+function statusBadge(status){
+  const map = {
+    uploaded:['info','Queued'], extracting:['info','Processing'],
+    review:['warn','Review Required'], reasoning:['info','Comparing'],
+    complete:['ok','Processed'], failed:['bad','Failed'],
+  };
+  const [cls,label] = map[status] || ['neutral', status || 'Unknown'];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function avgConfidence(fields){
+  const withConf = (fields||[]).filter(f=>f.confidence!=null);
+  if(!withConf.length) return null;
+  return withConf.reduce((s,f)=>s+Number(f.confidence),0) / withConf.length;
 }
 
-function renderDocList() {
-  const el = document.getElementById("docList");
-  if (!documents.length) {
-    el.innerHTML = `<div class="empty-list">No documents yet. Upload a certificate, application or receipt above to start the pipeline.</div>`;
-    return;
-  }
-  el.innerHTML = documents.map(d => `
-    <div class="doc-item ${d.doc_id === selectedDocId ? 'active' : ''}" data-id="${esc(d.doc_id)}">
-      <div class="fname">${esc(d.filename)}</div>
-      <div class="meta">
-        <span class="badge ${esc(d.status)}">${esc(d.status)}</span>
-        <span class="docid">${esc(shortId(d.doc_id))}</span>
-        ${d.vendor ? `<span>· ${esc(d.vendor)}</span>` : ""}
-      </div>
-    </div>
-  `).join("");
-  el.querySelectorAll(".doc-item").forEach(node => {
-    node.addEventListener("click", () => selectDocument(node.dataset.id));
+async function loadSnapshot(force=false){
+  if(SNAPSHOT && !force) return SNAPSHOT;
+  const [documents, config] = await Promise.all([apiGet('/api/documents'), apiGet('/api/config')]);
+  const perDoc = await Promise.all(documents.map(async d => {
+    const [fields, discrepancies, actions] = await Promise.all([
+      apiGet(`/api/documents/${d.doc_id}/fields`).catch(()=>[]),
+      apiGet(`/api/documents/${d.doc_id}/discrepancies`).catch(()=>[]),
+      apiGet(`/api/documents/${d.doc_id}/actions`).catch(()=>[]),
+    ]);
+    return {doc_id:d.doc_id, fields, discrepancies, actions: actions.map(a=>({...a, doc_id:d.doc_id}))};
+  }));
+  const fieldsByDoc = {}, discMap = new Map(), actions = [];
+  perDoc.forEach(p => {
+    fieldsByDoc[p.doc_id] = p.fields;
+    p.discrepancies.forEach(d => discMap.set(d.discrepancy_id, d));
+    actions.push(...p.actions);
   });
+  // DISCREPANCIES.status is always 'open' at the schema level (no resolve step exists
+  // server-side). We derive a friendlier lifecycle client-side from the linked ACTIONS
+  // row, since that's the thing that actually changes state: no action yet → open,
+  // a proposed action → under review, a decided action → resolved.
+  const discrepancies = [...discMap.values()].map(d => {
+    const linked = actions.filter(a => a.discrepancy_id === d.discrepancy_id);
+    let derived = 'open';
+    if(linked.some(a => a.status === 'approved' || a.status === 'rejected')) derived = 'resolved';
+    else if(linked.length) derived = 'review';
+    return {...d, derived_status: derived};
+  });
+  SNAPSHOT = {documents, threshold: config.confidence_threshold, fieldsByDoc, discrepancies, actions};
+  return SNAPSHOT;
 }
 
-/* ---------------- upload ---------------- */
+/* ---- page shell / routing ---- */
+async function show(page, opts={}){
+  document.querySelectorAll('.sidebtn[data-page]').forEach(b=>b.classList.toggle('active', b.dataset.page===page));
+  const main = document.getElementById('main');
+  main.classList.remove('page-enter');
+  main.innerHTML = '<div class="skeleton">Loading…</div>';
+  try{
+    main.innerHTML = await PAGES[page](opts);
+  }catch(e){
+    main.innerHTML = `<div class="empty"><b>Couldn't load this page.</b><div class="small" style="margin-top:6px">${escapeHtml(e.message)}</div><button class="btn" style="margin-top:14px" onclick="show('${page}')">Retry</button></div>`;
+  }
+  void main.offsetWidth;
+  main.classList.add('page-enter');
+  window.scrollTo(0,0);
+}
+function openCase(docId){ ACTIVE_DOC_ID = docId; show('cases'); }
+function openReview(docId){ ACTIVE_DOC_ID = docId; show('review'); }
+function openAudit(docId){ ACTIVE_DOC_ID = docId; show('audit'); }
+function openApp(){
+  if(!localStorage.getItem('jardSession')){openAuth('signin');return}
+  document.getElementById('landing').style.display='none';document.getElementById('app').style.display='block';show('dashboard');refreshAccount()
+}
+function closeApp(){document.getElementById('app').style.display='none';document.getElementById('landing').style.display='block';window.scrollTo(0,0)}
 
-const dropzone = document.getElementById("dropzone");
-const fileInput = document.getElementById("fileInput");
-const uploadStatus = document.getElementById("uploadStatus");
+const PAGES = {
 
-fileInput.addEventListener("change", () => {
-  if (fileInput.files.length) uploadFiles(Array.from(fileInput.files));
+dashboard: async () => {
+  const s = await loadSnapshot();
+  const openDiscs = s.discrepancies.filter(d=>d.derived_status==='open');
+  const pendingReviewDocs = s.documents.filter(d=>d.status==='review');
+  const proposedActions = s.actions.filter(a=>a.status==='proposed');
+  const recent = [...s.documents].sort((a,b)=> new Date(b.uploaded_at) - new Date(a.uploaded_at)).slice(0,5);
+
+  const nba = pendingReviewDocs.length
+    ? {label:'Recommended', text:`Resolve the pending fields in ${caseLabel(pendingReviewDocs[0].doc_id)}.`, action:`openReview('${pendingReviewDocs[0].doc_id}')`, cta:'Open Review →'}
+    : proposedActions.length
+      ? {label:'Recommended', text:`Decide on the proposed action for ${caseLabel(proposedActions[0].doc_id)}.`, action:`show('actions')`, cta:'Open Actions →'}
+      : {label:'All caught up', text:'No documents are currently blocked on review or approval.', action:`show('documents')`, cta:'Upload document →'};
+
+  const attnRows = [];
+  if(openDiscs.length) attnRows.push(`<div class="attn-row"><div class="attn-left"><span class="attn-sev high"></span>${openDiscs.length} discrepanc${openDiscs.length===1?'y':'ies'} need review</div><button class="btn sm" onclick="show('discrepancies')">View</button></div>`);
+  if(pendingReviewDocs.length) attnRows.push(`<div class="attn-row"><div class="attn-left"><span class="attn-sev med"></span>${pendingReviewDocs.length} document${pendingReviewDocs.length===1?'':'s'} awaiting review</div><button class="btn sm" onclick="show('review')">Open</button></div>`);
+  if(proposedActions.length) attnRows.push(`<div class="attn-row"><div class="attn-left"><span class="attn-sev low"></span>${proposedActions.length} action${proposedActions.length===1?'':'s'} awaiting approval</div><button class="btn sm" onclick="show('actions')">Open</button></div>`);
+  if(!attnRows.length) attnRows.push(`<div class="attn-row"><div class="attn-left">Nothing needs attention right now.</div></div>`);
+
+  return `
+<div class="pagehead"><div><div class="eyebrow">Workspace</div><h1>Document Intelligence</h1><div class="muted">A concise overview of the work that requires attention.</div></div><button class="btn primary" onclick="show('documents')">Upload document</button></div>
+<div class="summary">
+  <div class="metric"><div class="muted small">Documents Processed</div><div class="num">${s.documents.length}</div></div>
+  <div class="metric"><div class="muted small">Pending Review</div><div class="num">${pendingReviewDocs.length}</div></div>
+  <div class="metric"><div class="muted small">Open Discrepancies</div><div class="num">${openDiscs.length}</div></div>
+  <div class="metric"><div class="muted small">Actions Awaiting Approval</div><div class="num">${proposedActions.length}</div></div>
+</div>
+<div class="panel">
+  <div class="panelhead"><h3>Next best action</h3></div>
+  <div class="nba">
+    <div><div class="nba-label">${nba.label}</div><p>${escapeHtml(nba.text)}</p></div>
+    <button class="btn primary" onclick="${nba.action}">${nba.cta}</button>
+  </div>
+</div>
+<div class="panel">
+  <div class="panelhead"><h3>Recent Documents</h3></div>
+  <div class="tablewrap"><table><tr><th>Document</th><th>Vendor</th><th>Status</th><th>Uploaded</th><th></th></tr>
+  ${recent.length ? recent.map(d=>`
+    <tr><td><b>${escapeHtml(d.filename)}</b><br><span class="small muted">${caseLabel(d.doc_id)}</span></td>
+    <td>${escapeHtml(d.vendor||'—')}</td><td>${statusBadge(d.status)}</td><td>${timeAgo(d.uploaded_at)}</td>
+    <td><button class="btn sm" onclick="openCase('${d.doc_id}')">View</button></td></tr>`).join('')
+    : `<tr><td colspan="5" class="empty">No documents uploaded yet.</td></tr>`}
+  </table></div>
+</div>
+<div class="panel"><div class="panelhead"><h3>Needs Attention</h3></div><div>${attnRows.join('')}</div></div>
+`;
+},
+
+documents: async () => {
+  const s = await loadSnapshot();
+  const rows = [...s.documents].sort((a,b)=> new Date(b.uploaded_at) - new Date(a.uploaded_at)).map(d => {
+    const conf = avgConfidence(s.fieldsByDoc[d.doc_id]);
+    const btn = d.status === 'review'
+      ? `<button class="btn sm" onclick="openReview('${d.doc_id}')">Review</button>`
+      : `<button class="btn sm" onclick="openCase('${d.doc_id}')">View</button>`;
+    return `<tr><td><b>${escapeHtml(d.filename)}</b></td><td>${escapeHtml(d.document_type||'—')}</td>
+      <td>${caseLabel(d.doc_id)}</td><td>${statusBadge(d.status)}</td>
+      <td>${conf!=null ? confBar(conf) : '<span class="muted small">—</span>'}</td>
+      <td>${timeAgo(d.uploaded_at)}</td><td>${btn}</td></tr>`;
+  }).join('');
+
+  return `
+<div class="pagehead"><div><div class="eyebrow">Workspace</div><h1>Documents</h1><div class="muted">Find, inspect and route processed documents.</div></div></div>
+${stageTracker('extract')}
+<label class="dropzone" id="dropzone">
+  <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.tiff,.bmp,.txt" multiple>
+  <div>Drop scanned certificates, forms or receipts — or click to upload<span class="hint">Multiple files supported</span></div>
+</label>
+<div class="upload-status" id="uploadStatus"></div>
+<div class="toolbar">
+  <input placeholder="Search documents…" oninput="filterDocs(this.value)">
+  <select><option>All statuses</option><option>Processed</option><option>Review Required</option></select>
+  <select><option>All types</option><option>Invoice</option><option>Purchase Order</option><option>Contract</option></select>
+  <select><option>Sort: Newest</option></select>
+</div>
+<div class="panel"><div class="panelhead"><h3>Document registry</h3><span class="small muted">${s.documents.length} document${s.documents.length===1?'':'s'}</span></div>
+<div class="tablewrap"><table id="docTable">
+<tr><th>Document</th><th>Type</th><th>Case</th><th>Status</th><th>Confidence</th><th>Uploaded</th><th></th></tr>
+${rows || '<tr><td colspan="7" class="empty">No documents yet — drop a file above to ingest one.</td></tr>'}
+</table></div></div>
+`;
+},
+
+cases: async () => {
+  const s = await loadSnapshot();
+  const docId = ACTIVE_DOC_ID || (s.documents[0] && s.documents[0].doc_id);
+  if(!docId) return `<div class="pagehead"><div><div class="eyebrow">Case detail</div><h1>Cases</h1></div></div><div class="empty">No documents uploaded yet. <a class="text-link" style="border:0" onclick="show('documents')">Go to Documents →</a></div>`;
+
+  const doc = s.documents.find(d=>d.doc_id===docId);
+  const related = await apiGet(`/api/documents/${docId}/related`).catch(()=>[]);
+  const discs = s.discrepancies.filter(d=>d.doc_id_1===docId || d.doc_id_2===docId);
+  const allDocs = [doc, ...related.map(r=>({doc_id:r.doc_id, filename:r.filename}))].filter(Boolean);
+  const fieldSets = await Promise.all(allDocs.map(d => s.fieldsByDoc[d.doc_id] ? Promise.resolve(s.fieldsByDoc[d.doc_id]) : apiGet(`/api/documents/${d.doc_id}/fields`).catch(()=>[])));
+
+  const fieldNames = [...new Set(fieldSets.flatMap(fs => fs.map(f=>f.field_name)))];
+  const compareRows = fieldNames.map(name => {
+    const cells = fieldSets.map(fs => fs.find(f=>f.field_name===name));
+    const values = cells.map(c => c && c.value);
+    const hasMismatch = new Set(values.filter(v=>v!=null)).size > 1;
+    return `<tr><td>${escapeHtml(name)}</td>${cells.map(c=>`<td class="${hasMismatch?'discrepancy':'match'}">${c ? escapeHtml(c.value ?? '—') : '<span class="muted">—</span>'}</td>`).join('')}<td>${hasMismatch?'<span class="badge bad">Discrepancy</span>':'<span class="badge ok">Match</span>'}</td></tr>`;
+  }).join('');
+
+  const canRunComparison = doc && doc.status === 'reasoning';
+
+  return `
+<div class="pagehead"><div><div class="eyebrow">Case detail</div><h1>${caseLabel(docId)}</h1><div class="muted">${escapeHtml(doc?.vendor||'—')} · ${escapeHtml(doc?.filename||'')}</div></div>
+${canRunComparison ? `<button class="btn primary" onclick="runComparison('${docId}')">Run comparison</button>` : ''}</div>
+${stageTracker('compare')}
+<div class="panel"><div class="panelhead"><h3>Linked Documents</h3></div>
+<div class="linked-docs">
+  ${allDocs.length ? allDocs.map(d=>`<div class="linked-doc">${escapeHtml(d.filename)}</div>`).join('') : '<div class="small muted" style="padding:4px 0">No linked documents.</div>'}
+</div></div>
+<div class="panel"><div class="panelhead"><h3>Cross-Document Comparison</h3>${discs.length ? `<span class="badge bad">${discs.length} discrepanc${discs.length===1?'y':'ies'}</span>` : '<span class="badge ok">No discrepancies</span>'}</div>
+${allDocs.length > 1 ? `<div class="tablewrap"><table class="compare-table">
+<tr><th>Field</th>${allDocs.map(d=>`<th>${escapeHtml(d.filename)}</th>`).join('')}<th>Result</th></tr>
+${compareRows || `<tr><td colspan="${allDocs.length+2}" class="empty">No extracted fields to compare yet.</td></tr>`}
+</table></div>` : `<div class="empty">This document has no linked documents to compare against yet.</div>`}
+</div>
+${discs.length ? `<div style="display:flex;justify-content:flex-end"><button class="btn primary" onclick="show('actions')">Review proposed action →</button></div>` : ''}
+`;
+},
+
+review: async () => {
+  const s = await loadSnapshot();
+  const pending = [];
+  s.documents.forEach(d => {
+    (s.fieldsByDoc[d.doc_id]||[]).forEach(f => {
+      if(f.confidence!=null && Number(f.confidence) < s.threshold){
+        pending.push({...f, doc_id:d.doc_id, filename:d.filename});
+      }
+    });
+  });
+
+  if(!pending.length){
+    return `<div class="pagehead"><div><div class="eyebrow">Human review</div><h1>Review Queue</h1><div class="muted">Resolve the lowest-confidence fields before they move forward.</div></div><span class="badge ok">Queue empty</span></div>${stageTracker('review')}<div class="empty">Nothing is waiting on human review right now.</div>`;
+  }
+
+  const current = pending.find(p => p.doc_id === ACTIVE_DOC_ID) || pending[0];
+  window.__reviewCurrent = current;
+
+  return `
+<div class="pagehead"><div><div class="eyebrow">Human review</div><h1>Review Queue</h1><div class="muted">Resolve the lowest-confidence fields before they move forward.</div></div><span class="badge warn">${pending.length} item${pending.length===1?'':'s'} pending</span></div>
+${stageTracker('review')}
+<div class="panel"><div class="panelhead"><h3>${escapeHtml(current.filename)} · ${caseLabel(current.doc_id)}</h3><span class="badge warn" id="reviewBadge">Review Required</span></div>
+<div style="padding:20px"><div class="review-layout">
+  <div>
+    <div class="small muted" style="text-transform:uppercase;letter-spacing:.06em">Field</div>
+    <h2 style="margin:4px 0;font-family:var(--serif);font-weight:500">${escapeHtml(current.field_name)}</h2>
+    <div class="small muted">Extracted value</div>
+    <div style="font-size:26px;font-weight:700;margin:6px 0">${escapeHtml(current.value ?? '—')}</div>
+    ${confBar(Number(current.confidence))}
+    <input id="correctInput" class="correct-input" placeholder="Enter corrected value">
+    <div id="reviewActions" style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn" onclick="toggleCorrect()">Correct Value</button>
+      <button class="btn primary" onclick="confirmReview()">Confirm</button>
+    </div>
+  </div>
+  <div class="review-side">
+    <h4>Review Guidance</h4>
+    <div class="rs-row"><span class="muted">Threshold</span><b>${Math.round(s.threshold*100)}%</b></div>
+    <div class="rs-row"><span class="muted">Current</span><b style="color:var(--amber)">${Math.round(Number(current.confidence)*100)}%</b></div>
+    <div class="rs-row"><span class="muted">Case</span><b>${caseLabel(current.doc_id)}</b></div>
+    <div class="rs-row"><span class="muted">Remaining</span><b>${pending.length}</b></div>
+  </div>
+</div></div></div>
+${pending.length > 1 ? `<div class="panel"><div class="panelhead"><h3>Queue</h3></div>${pending.map(p=>`<div class="queue-item ${p===current?'active':''}" onclick="ACTIVE_DOC_ID='${p.doc_id}';show('review')"><span>${escapeHtml(p.filename)} · ${escapeHtml(p.field_name)}</span>${confBar(Number(p.confidence))}</div>`).join('')}</div>` : ''}
+`;
+},
+
+discrepancies: async () => {
+  const s = await loadSnapshot();
+  const rows = s.discrepancies.map(d => {
+    const statusBadgeHtml = d.derived_status==='open' ? '<span class="badge warn">Open</span>'
+      : d.derived_status==='review' ? '<span class="badge info">Under Review</span>'
+      : '<span class="badge ok">Resolved</span>';
+    const sevBadge = d.severity==='high' ? '<span class="badge bad">High</span>' : d.severity==='medium' ? '<span class="badge warn">Medium</span>' : '<span class="badge neutral">Low</span>';
+    return `<tr data-status="${d.derived_status}"><td>${caseLabel(d.doc_id_1)}</td><td>${escapeHtml(d.field_name)}</td><td>${escapeHtml(d.value_1)}</td><td>${escapeHtml(d.value_2)}</td><td>${sevBadge}</td><td>${statusBadgeHtml}</td><td><button class="btn sm" onclick="openCase('${d.doc_id_1}')">Inspect</button></td></tr>`;
+  }).join('');
+
+  return `
+<div class="pagehead"><div><div class="eyebrow">Exceptions</div><h1>Discrepancies</h1><div class="muted">Differences identified across related documents.</div></div></div>
+${stageTracker('compare')}
+<div class="filter-row">
+  <button class="filter-chip active" onclick="filterDiscrepancies(this,'all')">All</button>
+  <button class="filter-chip" onclick="filterDiscrepancies(this,'open')">Open</button>
+  <button class="filter-chip" onclick="filterDiscrepancies(this,'review')">Under Review</button>
+  <button class="filter-chip" onclick="filterDiscrepancies(this,'resolved')">Resolved</button>
+</div>
+<div class="panel"><div class="panelhead"><h3>All discrepancies</h3><span class="small muted">${s.discrepancies.length} total</span></div>
+<div class="tablewrap"><table id="discTable">
+<tr><th>Case</th><th>Field</th><th>Expected</th><th>Actual</th><th>Severity</th><th>Status</th><th></th></tr>
+${rows || '<tr><td colspan="7" class="empty">No discrepancies detected yet.</td></tr>'}
+</table></div></div>
+`;
+},
+
+actions: async () => {
+  const s = await loadSnapshot();
+  const proposed = s.actions.filter(a=>a.status==='proposed');
+  const decided = s.actions.filter(a=>a.status!=='proposed');
+
+  const actionCard = (a) => {
+    const disc = s.discrepancies.find(d=>d.discrepancy_id===a.discrepancy_id);
+    return `
+<div class="panel"><div class="panelhead"><h3>${a.action_type==='email' ? 'Vendor Clarification Request' : 'Follow-up Task'} · ${caseLabel(a.doc_id)}</h3>
+<span class="approval-flag" id="flag-${a.action_id}">Human approval required</span></div>
+<div style="padding:20px">
+  <div class="action-meta-row"><span class="muted">Case</span><b>${caseLabel(a.doc_id)}</b></div>
+  ${disc ? `<div class="action-meta-row" style="border-bottom:1px solid var(--line);margin-bottom:12px;padding-bottom:12px"><span class="muted">Trigger</span><b>${escapeHtml(disc.field_name)} mismatch</b></div>` : ''}
+  <div class="small muted" style="text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Proposed ${a.action_type==='email'?'Message':'Task'}</div>
+  <div class="email-draft">${escapeHtml(a.content).replace(/\n/g,'<br>')}</div>
+  <div id="btns-${a.action_id}" style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+    <button class="btn danger" onclick="decideAction('${a.action_id}','rejected')">Reject</button>
+    <button class="btn primary" onclick="decideAction('${a.action_id}','approved')">Approve</button>
+  </div>
+</div></div>`;
+  };
+
+  return `
+<div class="pagehead"><div><div class="eyebrow">Controlled automation</div><h1>Proposed Actions</h1><div class="muted">JARD recommends. Humans decide.</div></div></div>
+${stageTracker('approve')}
+${proposed.length ? proposed.map(actionCard).join('') : `<div class="empty">No actions awaiting approval right now.</div>`}
+<div class="notice">JARD never sends this message automatically. Approving records the decision in the audit log — delivery remains a separate, explicit step outside this demo.</div>
+${decided.length ? `<div class="panel" style="margin-top:18px"><div class="panelhead"><h3>Decided</h3></div><div class="tablewrap"><table><tr><th>Case</th><th>Type</th><th>Status</th><th>Decided by</th></tr>${decided.map(a=>`<tr><td>${caseLabel(a.doc_id)}</td><td>${escapeHtml(a.action_type)}</td><td>${a.status==='approved'?'<span class="badge ok">Approved</span>':'<span class="badge bad">Rejected</span>'}</td><td>${escapeHtml(a.decided_by||'—')}</td></tr>`).join('')}</table></div></div>` : ''}
+`;
+},
+
+audit: async () => {
+  const s = await loadSnapshot();
+  const docId = ACTIVE_DOC_ID || (s.documents[0] && s.documents[0].doc_id);
+  if(!docId) return `<div class="pagehead"><div><div class="eyebrow">Traceability</div><h1>Audit Log</h1></div></div><div class="empty">No documents uploaded yet.</div>`;
+
+  const events = await apiGet(`/api/documents/${docId}/audit`).catch(()=>[]);
+  const doc = s.documents.find(d=>d.doc_id===docId);
+
+  return `
+<div class="pagehead"><div><div class="eyebrow">Traceability</div><h1>Audit Log</h1><div class="muted">${caseLabel(docId)} · ${escapeHtml(doc?.filename||'')}</div></div></div>
+${stageTracker('audit')}
+<div class="panel"><div class="panelhead"><h3>${caseLabel(docId)}</h3><span class="small muted">${events.length} event${events.length===1?'':'s'}</span></div>
+<div class="timeline">
+${events.length ? events.map(e=>`<div class="event"><span class="small muted">${new Date((e.timestamp||'').replace(' ','T')).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span><span class="dot"></span><div><b>${escapeHtml(e.action)}</b><div class="small muted">${escapeHtml(e.agent_name)}${e.output_summary ? ' · '+escapeHtml(e.output_summary) : ''}</div></div></div>`).join('')
+  : '<div class="empty">No audit events recorded for this document yet.</div>'}
+</div></div>
+`;
+},
+
+knowledge: async () => `
+<div class="pagehead"><div><div class="eyebrow">Knowledge base</div><h1>Search the Knowledge Base</h1><div class="muted">Ask a question in plain English across processed documents and cases.</div></div></div>
+<div class="panel"><div style="padding:22px">
+  <div class="kb-search"><input id="kbq" value="Which vendors have unresolved discrepancies this month?"><button class="btn primary" onclick="runQuery()">Run Query</button></div>
+  <div id="queryResult" style="margin-top:20px"></div>
+</div></div>
+<div class="panel"><div class="panelhead"><h3>Query controls</h3></div><div style="padding:18px" class="small muted">Natural-language queries are translated into a single validated SELECT statement and run under a read-only database identity — no query can modify DOC_INTEL.</div></div>
+`,
+
+};
+
+/* ---- Documents: search + upload ---- */
+function filterDocs(q){document.querySelectorAll('#docTable tr').forEach((r,i)=>{if(i===0)return;r.style.display=r.innerText.toLowerCase().includes(q.toLowerCase())?'':'none'})}
+
+document.addEventListener('change', e => { if(e.target && e.target.id==='fileInput' && e.target.files.length) uploadFiles(Array.from(e.target.files)); });
+document.addEventListener('dragover', e => { const z=e.target.closest && e.target.closest('#dropzone'); if(z){ e.preventDefault(); z.classList.add('drag'); } });
+document.addEventListener('dragleave', e => { const z=e.target.closest && e.target.closest('#dropzone'); if(z) z.classList.remove('drag'); });
+document.addEventListener('drop', e => {
+  const z = e.target.closest && e.target.closest('#dropzone');
+  if(!z) return;
+  e.preventDefault(); z.classList.remove('drag');
+  const files = Array.from(e.dataTransfer.files||[]);
+  if(files.length) uploadFiles(files);
 });
-["dragover", "dragenter"].forEach(evt =>
-  dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add("drag"); })
-);
-["dragleave", "drop"].forEach(evt =>
-  dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.remove("drag"); })
-);
-dropzone.addEventListener("drop", e => {
-  const files = Array.from(e.dataTransfer.files || []);
-  if (files.length) uploadFiles(files);
-});
 
-async function uploadFiles(files) {
-  let lastDocId = null;
-  let okCount = 0;
-  for (let i = 0; i < files.length; i++) {
+async function uploadFiles(files){
+  const status = document.getElementById('uploadStatus');
+  let okCount = 0, lastDocId = null;
+  for(let i=0;i<files.length;i++){
     const file = files[i];
-    uploadStatus.textContent = files.length > 1
-      ? `ingesting ${file.name} (${i + 1} of ${files.length})…`
-      : `ingesting ${file.name}…`;
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const result = await api("/api/documents/upload", { method: "POST", body: formData });
+    if(status) status.textContent = files.length>1 ? `ingesting ${file.name} (${i+1} of ${files.length})…` : `ingesting ${file.name}…`;
+    const form = new FormData();
+    form.append('file', file);
+    form.append('uploaded_by', currentUser());
+    try{
+      const res = await fetch('/api/documents/upload', {method:'POST', body: form});
+      const result = await res.json();
+      if(!res.ok) throw new Error(result.error || 'upload failed');
       lastDocId = result.doc_id;
       okCount++;
-      await loadDocuments();
-    } catch (e) {
-      uploadStatus.textContent = `${file.name} failed: ${e.message}`;
-      if (files.length === 1) { fileInput.value = ""; return; }
+      // Auto-approved docs sit in 'reasoning' — run the compare+action-draft step now
+      // so the pipeline actually completes instead of stalling until someone visits Cases.
+      if(result.gate_decision === 'AUTO_APPROVE'){
+        await apiPost(`/api/documents/${result.doc_id}/process`).catch(()=>{});
+      }
+    }catch(e){
+      if(status) status.textContent = `${file.name} failed: ${e.message}`;
+      if(files.length===1) return;
       continue;
     }
   }
-  fileInput.value = "";
-  uploadStatus.textContent = files.length > 1
-    ? `done — ${okCount} of ${files.length} file(s) ingested`
-    : uploadStatus.textContent;
-  if (lastDocId) selectDocument(lastDocId);
+  const fileInput = document.getElementById('fileInput');
+  if(fileInput) fileInput.value = '';
+  await loadSnapshot(true);
+  if(status) status.textContent = files.length>1 ? `done — ${okCount} of ${files.length} file(s) ingested` : `done — ${files[0].name} ingested`;
+  if(lastDocId) openCase(lastDocId); else show('documents');
 }
 
-/* ---------------- document detail ---------------- */
-
-async function selectDocument(docId) {
-  selectedDocId = docId;
-  document.getElementById("noDocMsg").style.display = "none";
-  document.getElementById("docView").style.display = "flex";
-  renderDocList();
-  await refreshDocumentDetail();
+async function runComparison(docId){
+  try{
+    await apiPost(`/api/documents/${docId}/process`);
+    await loadSnapshot(true);
+    show('cases');
+  }catch(e){ alert(`Comparison failed: ${e.message}`); }
 }
 
-async function refreshDocumentDetail() {
-  if (!selectedDocId) return;
-  const [doc, fields, discrepancies, actions, audit, related] = await Promise.all([
-    api(`/api/documents/${selectedDocId}`).catch(() => null),
-    api(`/api/documents/${selectedDocId}/fields`).catch(() => []),
-    api(`/api/documents/${selectedDocId}/discrepancies`).catch(() => []),
-    api(`/api/documents/${selectedDocId}/actions`).catch(() => []),
-    api(`/api/documents/${selectedDocId}/audit`).catch(() => []),
-    api(`/api/documents/${selectedDocId}/related`).catch(() => []),
-  ]);
-  if (!doc) return;
-
-  document.getElementById("docTitle").textContent = doc.filename;
-  document.getElementById("docSub").innerHTML =
-    `<span class="mono">${esc(doc.doc_id)}</span> · ${esc(doc.document_type || "unclassified")}` +
-    (doc.vendor ? ` · ${esc(doc.vendor)}` : "") +
-    ` · <span class="badge ${esc(doc.status)}">${esc(doc.status)}</span>`;
-
-  renderDocActions(doc);
-  renderFields(fields, doc.status);
-  renderCaseFile(related);
-  renderDiscrepancies(discrepancies, actions);
-  renderAudit(audit);
-
-  document.getElementById("countFields").textContent = fields.length ? `(${fields.length})` : "";
-  document.getElementById("countCase").textContent = related.length ? `(${related.length})` : "";
-  document.getElementById("countDisc").textContent = discrepancies.length ? `(${discrepancies.length})` : "";
-  document.getElementById("countAudit").textContent = audit.length ? `(${audit.length})` : "";
+/* ---- Review queue ---- */
+function toggleCorrect(){
+  const input = document.getElementById('correctInput');
+  input.style.display = 'block';
+  input.focus();
 }
-
-function renderDocActions(doc) {
-  const el = document.getElementById("docActions");
-  el.innerHTML = "";
-  if (doc.status === "reasoning") {
-    const btn = document.createElement("button");
-    btn.className = "primary";
-    btn.textContent = "Run reasoning & draft actions";
-    btn.onclick = async () => {
-      btn.disabled = true;
-      btn.textContent = "Reasoning…";
-      try { await api(`/api/documents/${doc.doc_id}/process`, { method: "POST" }); }
-      catch (e) { alert(e.message); }
-      await loadDocuments();
-      await refreshDocumentDetail();
-    };
-    el.appendChild(btn);
-  }
-  const refresh = document.createElement("button");
-  refresh.textContent = "Refresh";
-  refresh.onclick = refreshDocumentDetail;
-  el.appendChild(refresh);
-}
-
-function renderFields(fields, docStatus) {
-  const el = document.getElementById("panel-fields");
-  if (!fields.length) {
-    el.innerHTML = `<div class="empty-panel">No fields extracted for this document.</div>`;
-    return;
-  }
-  const threshold = config.confidence_threshold;
-  el.innerHTML = `
-    <table class="fields">
-      <thead><tr><th>Field</th><th>Value</th><th>Confidence</th><th>Source</th></tr></thead>
-      <tbody>
-        ${fields.map(f => {
-          const conf = f.confidence === null || f.confidence === undefined ? null : Number(f.confidence);
-          const low = conf !== null && conf < threshold;
-          return `
-          <tr class="${low ? 'low-conf' : ''}" data-field-id="${esc(f.field_id)}">
-            <td class="mono">${esc(f.field_name)}</td>
-            <td>${esc(f.value)}</td>
-            <td>
-              ${conf === null ? '<span class="mono" style="color:var(--faint)">—</span>' : `
-                <span class="conf-bar">
-                  <span class="conf-track"><span class="conf-fill ${low ? 'low' : ''}" style="width:${Math.round(conf*100)}%"></span></span>
-                  ${conf.toFixed(2)}
-                </span>`}
-              ${low && docStatus === "review" ? `
-                <div class="review-row">
-                  <input type="text" class="review-input" placeholder="corrected value" value="${esc(f.value)}">
-                  <button class="review-confirm" title="Confirm as-is">Confirm</button>
-                  <button class="review-correct" title="Save corrected value">Correct</button>
-                </div>` : ""}
-            </td>
-            <td class="mono" style="color:var(--faint)">${esc(f.source_agent || "")}</td>
-          </tr>`;
-        }).join("")}
-      </tbody>
-    </table>
-  `;
-
-  el.querySelectorAll(".review-confirm, .review-correct").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      const row = e.target.closest("tr");
-      const fieldId = row.dataset.fieldId;
-      const field = fields.find(f => f.field_id === fieldId);
-      const input = row.querySelector(".review-input");
-      const isCorrect = e.target.classList.contains("review-correct");
-      const humanValue = isCorrect ? input.value : field.value;
-      const status = isCorrect ? "corrected" : "confirmed";
-      e.target.disabled = true;
-      try {
-        await api("/api/reviews", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            doc_id: selectedDocId,
-            field_id: fieldId,
-            field_name: field.field_name,
-            ai_value: field.value,
-            human_value: humanValue,
-            status,
-            reviewed_by: "case_handler",
-          }),
-        });
-        await loadDocuments();
-        await refreshDocumentDetail();
-      } catch (err) {
-        alert(err.message);
-        e.target.disabled = false;
-      }
+async function confirmReview(){
+  const current = window.__reviewCurrent;
+  if(!current) return;
+  const input = document.getElementById('correctInput');
+  const corrected = input && input.style.display==='block' ? input.value.trim() : '';
+  const isCorrection = corrected.length > 0;
+  try{
+    await apiPost('/api/reviews', {
+      doc_id: current.doc_id, field_id: current.field_id, field_name: current.field_name,
+      ai_value: current.value, human_value: isCorrection ? corrected : current.value,
+      status: isCorrection ? 'corrected' : 'confirmed', reviewed_by: currentUser(),
     });
+    await loadSnapshot(true);
+    // If that was the doc's last open review, it's now sitting in 'reasoning' — advance it.
+    const doc = await apiGet(`/api/documents/${current.doc_id}`).catch(()=>null);
+    if(doc && doc.status === 'reasoning'){
+      await apiPost(`/api/documents/${current.doc_id}/process`).catch(()=>{});
+      await loadSnapshot(true);
+    }
+  }catch(e){
+    alert(`Couldn't record review: ${e.message}`);
+    return;
+  }
+  show('review');
+}
+
+/* ---- Discrepancies filter ---- */
+function filterDiscrepancies(btn,key){
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#discTable tr[data-status]').forEach(r=>{
+    r.style.display = (key==='all' || r.dataset.status===key) ? '' : 'none';
   });
 }
 
-function renderCaseFile(related) {
-  const el = document.getElementById("panel-case");
-  if (!related.length) {
-    el.innerHTML = `<div class="empty-panel">No linked documents yet. Once a related document (e.g. an income certificate for this welfare application) is uploaded and matched, it will appear here as part of the same case.</div>`;
-    return;
-  }
-  el.innerHTML = related.map(r => `
-    <div class="case-card" data-id="${esc(r.doc_id)}">
-      <div class="c-main">
-        <div class="c-name">${esc(r.filename)}</div>
-        <div class="c-meta">${esc(r.document_type || "unclassified")}${r.vendor ? ` · ${esc(r.vendor)}` : ""} · <span class="badge ${esc(r.status)}">${esc(r.status)}</span></div>
-      </div>
-      <div class="c-rel">${esc((r.relationship_type || "").replace(/_/g, " "))}</div>
-      ${r.confidence !== null && r.confidence !== undefined ? `<div class="c-conf">${Number(r.confidence).toFixed(2)}</div>` : ""}
-    </div>
-  `).join("");
-  el.querySelectorAll(".case-card").forEach(node => {
-    node.addEventListener("click", () => selectDocument(node.dataset.id));
-  });
+/* ---- Actions ---- */
+async function decideAction(actionId, decision){
+  const flag = document.getElementById(`flag-${actionId}`);
+  const btns = document.getElementById(`btns-${actionId}`);
+  try{
+    await apiPost(`/api/actions/${actionId}/decide`, {decision, decided_by: currentUser()});
+    await loadSnapshot(true);
+    if(flag) flag.outerHTML = decision==='approved' ? '<span class="badge ok">Approved</span>' : '<span class="badge bad">Rejected</span>';
+    if(btns) btns.innerHTML = decision==='approved'
+      ? '<span class="small muted">Approved and recorded in the audit log. JARD has not sent this message — delivery remains a separate step.</span>'
+      : '<span class="small muted">Rejected. Recorded in the audit log — no message was drafted or sent.</span>';
+  }catch(e){ alert(`Couldn't record decision: ${e.message}`); }
 }
 
-function renderDiscrepancies(discrepancies, actions) {
-  const el = document.getElementById("panel-discrepancies");
-  if (!discrepancies.length) {
-    el.innerHTML = `<div class="empty-panel">No discrepancies found yet. Run reasoning once the document reaches the "reasoning" stage.</div>`;
-    return;
-  }
-  el.innerHTML = discrepancies.map(d => {
-    const relatedActions = actions.filter(a => a.discrepancy_id === d.discrepancy_id);
-    return `
-      <div class="disc-card">
-        <div class="disc-head">
-          <span class="badge ${esc(d.severity)}">${esc(d.severity)}</span>
-          <span class="field-name">${esc(d.field_name)}</span>
-          <span style="color:var(--faint); font-size:11.5px;">${esc(d.status)}</span>
-        </div>
-        <div class="disc-values">
-          <div class="v"><div class="label">Document A</div><div class="val">${esc(d.value_1)}</div></div>
-          <div class="v"><div class="label">Document B</div><div class="val">${esc(d.value_2)}</div></div>
-        </div>
-        <div class="explain">${esc(d.explanation || "")}</div>
-        ${relatedActions.length ? relatedActions.map(a => `
-          <div class="action-card" data-action-id="${esc(a.action_id)}">
-            <div class="a-head">
-              <span class="a-type">${esc(a.action_type.replace('_', ' '))}</span>
-              <span class="badge ${a.status === 'proposed' ? 'medium' : (a.status === 'approved' ? 'low' : 'high')}">${esc(a.status)}</span>
-            </div>
-            <div class="content">${esc(a.content)}</div>
-            ${a.status === "proposed" ? `
-              <div class="a-controls">
-                <button class="primary act-approve">Approve</button>
-                <button class="danger act-reject">Reject</button>
-              </div>` : `<div style="font-size:11.5px; color:var(--faint);">decided by ${esc(a.decided_by || "—")}</div>`}
-          </div>
-        `).join("") : ""}
-      </div>
+/* ---- Knowledge base ---- */
+async function runQuery(){
+  const q = document.getElementById('kbq').value.trim();
+  const result = document.getElementById('queryResult');
+  if(!q) return;
+  result.innerHTML = '<div class="small muted">Running…</div>';
+  try{
+    const res = await apiPost('/api/chat', {question: q});
+    if(res.error){
+      result.innerHTML = `<div class="notice" style="border-color:var(--red)"><b>Query rejected.</b><br><span class="small">${escapeHtml(res.error)}</span></div>`;
+      return;
+    }
+    const cols = res.columns || [];
+    const rows = res.rows || [];
+    result.innerHTML = `
+      <div class="notice"><b>${rows.length} row${rows.length===1?'':'s'} found</b><br><span class="small">${escapeHtml(res.explanation||'')}</span></div>
+      <div class="tablewrap" style="margin-top:14px"><table>
+        <tr>${cols.map(c=>`<th>${escapeHtml(c)}</th>`).join('')}</tr>
+        ${rows.length ? rows.map(r=>`<tr>${r.map(v=>`<td>${escapeHtml(v)}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${cols.length||1}" class="empty">No matching rows.</td></tr>`}
+      </table></div>
+      <div class="small muted" style="margin-top:14px;text-transform:uppercase;letter-spacing:.06em">Generated SQL</div>
+      <div class="kb-sources"><span class="kb-source">${escapeHtml(res.sql||'')}</span></div>
     `;
-  }).join("");
-
-  el.querySelectorAll(".act-approve, .act-reject").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      const card = e.target.closest(".action-card");
-      const actionId = card.dataset.actionId;
-      const decision = e.target.classList.contains("act-approve") ? "approved" : "rejected";
-      btn.disabled = true;
-      try {
-        await api(`/api/actions/${actionId}/decide`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ decision, decided_by: "case_handler" }),
-        });
-        await refreshDocumentDetail();
-      } catch (err) {
-        alert(err.message);
-        btn.disabled = false;
-      }
-    });
-  });
-}
-
-function renderAudit(audit) {
-  const el = document.getElementById("panel-audit");
-  if (!audit.length) {
-    el.innerHTML = `<div class="empty-panel">No audit events recorded yet.</div>`;
-    return;
+  }catch(e){
+    result.innerHTML = `<div class="notice" style="border-color:var(--red)">Query failed: ${escapeHtml(e.message)}</div>`;
   }
-  el.innerHTML = `<div class="ledger">${audit.map(a => `
-    <div class="ledger-entry">
-      <div class="l-top">
-        <span class="l-time">${esc(fmtTime(a.timestamp))}</span>
-        <span class="l-agent">${esc(a.agent_name)}</span>
-      </div>
-      <div class="l-action">${esc((a.action || "").replace(/_/g, " "))}${a.confidence !== null && a.confidence !== undefined ? ` <span class="mono" style="color:var(--faint); font-weight:400; font-size:11.5px;">(${Number(a.confidence).toFixed(2)})</span>` : ""}</div>
-      <div class="l-summary">${a.input_summary ? `<span class="k">in:</span> ${esc(a.input_summary)}` : ""}</div>
-      <div class="l-summary">${a.output_summary ? `<span class="k">out:</span> ${esc(a.output_summary)}` : ""}</div>
-    </div>
-  `).join("")}</div>`;
 }
 
-/* ---------------- tabs ---------------- */
 
-document.querySelectorAll("nav.tabs .tab").forEach(btn => {
-  btn.addEventListener("click", () => {
-    activeTab = btn.dataset.tab;
-    document.querySelectorAll("nav.tabs .tab").forEach(b => b.classList.toggle("active", b === btn));
-    ["fields", "case", "discrepancies", "audit"].forEach(t => {
-      document.getElementById(`panel-${t}`).classList.toggle("hidden", t !== activeTab);
-    });
-  });
-});
-
-/* ---------------- chat ---------------- */
-
-document.getElementById("chatForm").addEventListener("submit", async (e) => {
+/* ---- Auth ---- */
+let authMode='signin';
+function openAuth(mode='signin'){setAuthMode(mode);document.getElementById('authBack').style.display='flex';setTimeout(()=>document.getElementById('email').focus(),50)}
+function closeAuth(){document.getElementById('authBack').style.display='none'}
+function setAuthMode(mode){
+  authMode=mode;
+  document.getElementById('tabSignin').classList.toggle('active',mode==='signin');
+  document.getElementById('tabSignup').classList.toggle('active',mode==='signup');
+  document.getElementById('nameFields').classList.toggle('hidden',mode!=='signup');
+  document.getElementById('authTitle').textContent=mode==='signup'?'Create your account':'Sign in';
+  document.getElementById('authSub').textContent=mode==='signup'?'Create a workspace account for the JARD demo.':'Access your document intelligence workspace.';
+  document.getElementById('authSubmit').textContent=mode==='signup'?'Create Account':'Sign In';
+}
+function submitAuth(e){
   e.preventDefault();
-  const input = document.getElementById("chatInput");
-  const question = input.value.trim();
-  if (!question) return;
-  await runChatQuestion(question);
-});
-
-async function runChatQuestion(question) {
-  document.getElementById("chatInput").value = question;
-  const resultEl = document.getElementById("chatResult");
-  resultEl.innerHTML = `<div class="chat-loading">translating to SQL…</div>`;
-  try {
-    const result = await api("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question }),
-    });
-    renderChatResult(result);
-  } catch (err) {
-    resultEl.innerHTML = `<div class="chat-result"><div class="explanation sql-error">${esc(err.message)}</div></div>`;
-  }
+  const email=document.getElementById('email').value.trim();
+  const name=authMode==='signup' ? document.getElementById('fullName').value.trim() : (localStorage.getItem('jardName')||email.split('@')[0]);
+  const org=authMode==='signup' ? (document.getElementById('orgName').value.trim()||'JARD Workspace') : (localStorage.getItem('jardOrg')||'JARD Workspace');
+  const finalName=name||email.split('@')[0]||'User';
+  localStorage.setItem('jardSession','1');
+  localStorage.setItem('jardName',finalName);
+  localStorage.setItem('jardEmail',email);
+  localStorage.setItem('jardOrg',org);
+  closeAuth();openApp();refreshAccount();
 }
 
-const CHAT_EXAMPLES = [
-  "Show all welfare applicants earning below ₹2,00,000",
-  "Find land records owned by Ravi Kumar",
-  "List complaints from Chennai district",
-  "Show contractors bidding above ₹1 crore",
-  "Which documents are still waiting on human review?",
-];
-document.getElementById("chatExamples").innerHTML = CHAT_EXAMPLES.map(q =>
-  `<button type="button" class="chat-chip">${esc(q)}</button>`
-).join("");
-document.querySelectorAll(".chat-chip").forEach(chip => {
-  chip.addEventListener("click", () => runChatQuestion(chip.textContent));
+/* ---- Account menu + profile ---- */
+function refreshAccount(){
+  const name = localStorage.getItem('jardName') || 'Guest';
+  const email = localStorage.getItem('jardEmail') || 'guest@example.com';
+  const org = localStorage.getItem('jardOrg') || 'JARD Workspace';
+  const initials = name.split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase() || 'G';
+  document.getElementById('accountName').textContent = name;
+  document.getElementById('avatar').textContent = initials;
+  document.getElementById('avatarMenu').textContent = initials;
+  document.getElementById('menuName').textContent = name;
+  document.getElementById('menuOrg').textContent = org;
+  document.getElementById('menuEmail').textContent = email;
+}
+function toggleAccount(){document.getElementById('accountMenu').classList.toggle('show')}
+function openProfile(){
+  document.getElementById('profName').textContent = localStorage.getItem('jardName') || 'Guest';
+  document.getElementById('profEmail').textContent = localStorage.getItem('jardEmail') || '—';
+  document.getElementById('profOrg').textContent = localStorage.getItem('jardOrg') || 'JARD Workspace';
+  document.getElementById('profileBack').style.display = 'flex';
+}
+function closeProfile(){document.getElementById('profileBack').style.display='none'}
+function logout(){
+  localStorage.removeItem('jardSession');
+  localStorage.removeItem('jardName');
+  localStorage.removeItem('jardEmail');
+  localStorage.removeItem('jardOrg');
+  document.getElementById('accountMenu').classList.remove('show');
+  closeProfile();
+  closeApp();
+}
+document.addEventListener('click',(e)=>{
+  if(!e.target.closest('.account-wrap')) document.getElementById('accountMenu').classList.remove('show');
 });
 
-function renderChatResult(result) {
-  const resultEl = document.getElementById("chatResult");
-  if (result.error) {
-    resultEl.innerHTML = `
-      <div class="explanation">${esc(result.explanation || "")}</div>
-      <div class="sql-box sql-error">rejected: ${esc(result.error)}</div>
-    `;
-    return;
-  }
-  const columns = result.columns || (result.rows && result.rows[0] ? result.rows[0].map((_, i) => `col_${i}`) : []);
-  const rowsHtml = (result.rows || []).length
-    ? `<table class="chat-rows">
-        <thead><tr>${columns.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead>
-        <tbody>${result.rows.map(r => `<tr>${r.map(v => `<td>${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody>
-      </table>`
-    : `<div style="color:var(--faint); font-size:12.5px;">No rows returned.</div>`;
-  resultEl.innerHTML = `
-    <div class="explanation">${esc(result.explanation || "")}</div>
-    <div class="sql-box">${esc(result.sql || "")}</div>
-    ${rowsHtml}
-  `;
+
+/* --------------------------------------------------------------------------
+   JARD demo/backend integration bridge
+   The UI never invents backend responses. If the repository backend is running,
+   set window.JARD_API_BASE before this file loads (or use same-origin /api).
+   Otherwise the existing demo data remains active.
+   -------------------------------------------------------------------------- */
+window.JARD_API_BASE = window.JARD_API_BASE || '';
+window.JARD_REPOSITORY = 'https://github.com/Gryezen/JARD-document-intelligence';
+async function jardApi(path, options={}){
+  const base = window.JARD_API_BASE;
+  if(!base) return {connected:false, demo:true};
+  const response = await fetch(base.replace(/\/$/,'') + path, {
+    ...options,
+    headers:{'Content-Type':'application/json',...(options.headers||{})}
+  });
+  if(!response.ok) throw new Error(`JARD API ${response.status}`);
+  const type = response.headers.get('content-type') || '';
+  return type.includes('application/json') ? response.json() : response.text();
 }
 
-/* ---------------- boot ---------------- */
+/* Front-page reveal observer. */
+(function initLandingMotion(){
+  const root=document.getElementById('landing');
+  if(!root) return;
+  const reduce=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reveal=[...root.querySelectorAll('.section,.integrated-story,.landing-rail,.architecture,.story-panel')];
+  reveal.forEach(el=>el.classList.add('reveal-on-scroll'));
+  root.querySelectorAll('.grid3,.workflow').forEach(el=>el.classList.add('reveal-stagger'));
+  if(reduce){reveal.forEach(el=>el.classList.add('is-visible'));root.querySelectorAll('.reveal-stagger').forEach(el=>el.classList.add('is-visible'));return;}
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target);}});
+  },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+  root.querySelectorAll('.reveal-on-scroll,.reveal-stagger').forEach(el=>observer.observe(el));
 
-(async function init() {
-  await loadConfig();
-  await loadDocuments();
-  setInterval(loadDocuments, 8000);
+  root.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('click',e=>{
+    const target=document.querySelector(link.getAttribute('href'));
+    if(target){e.preventDefault();target.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});}
+  }));
 })();
+
+refreshAccount();
 </script>
 </body>
 </html>

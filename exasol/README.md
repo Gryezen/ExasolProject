@@ -123,16 +123,10 @@ resolve correctly when the project root is on `sys.path`, and `-m`
 guarantees that. Running `python api/routes.py` directly will fail with
 `ModuleNotFoundError: No module named 'agents'`.
 
-Once it's running, open **http://localhost:5005** in a browser — that's
-the whole app: Flask renders `templates/*.html` (Jinja) and serves
-`static/css`, `static/js` for the frontend, plus the JSON API under
-`/api/...`, all from the same process. Nothing separate to start.
-
-### 7. Deploying
-
-See `docs/DEPLOY.md` — covers the Render.com Blueprint (`render.yaml` +
-`Dockerfile`) and, importantly, the Exasol network-reachability question
-(`localhost:8563` only works when the app and the DB share a machine).
+Once it's running, open **http://localhost:5000** in a browser — that's
+the whole app: Flask serves the `frontend/index.html` dashboard at `/`
+and the JSON API under `/api/...` from the same process, so there's
+nothing separate to start for the frontend.
 
 ## Reliability rules this project follows
 
@@ -158,26 +152,9 @@ See `docs/DEPLOY.md` — covers the Render.com Blueprint (`render.yaml` +
 - `agents/chat.py` — NL → SQL with a forced tool call, a hard-coded schema description (no guessed columns), and `validate_sql()` as a second line of defense in front of the read-only DB identity
 - `agents/relationships.py` — links documents into the same case: a free deterministic rule pass (same vendor + a known compatible type pair, e.g. invoice↔purchase_order) runs first, with a bounded Gemini fallback only for vendor-matched pairs whose document types aren't in the known list yet
 - `orchestration/workflow.py` — drives `ingest → extract → link relationships → confidence gate` and, separately, `reasoning → action → complete` for a document once unblocked
-- `api/routes.py` — Flask page routes (Jinja templates, one per demo screen) plus the JSON API: upload, documents, fields, discrepancies, audit timeline, review submission, action approval, chat, and dashboard stats. `/api/documents/upload` runs the full ingest→extract→link→gate pipeline synchronously so a demo shows real processing, not a spinner
-- `templates/` + `static/` — multi-page frontend (Flask/Jinja templates, plain JS, no build step) laid out around the demo flow itself — **Dashboard → Upload → Extraction Results → Reasoning & Actions → Audit Trail → Chat**. Each document-scoped page (`/documents/<id>/extraction|reasoning|audit`) shares a pipeline-stage stepper so a judge can see at a glance where a document sits in `uploaded → extracting → review → reasoning → complete`. The previous single-page dashboard is kept for reference at `docs/legacy/single-page-frontend.html.bak`.
+- `api/routes.py` — Flask endpoints for upload, documents, fields, discrepancies, audit timeline, review submission, action approval, and chat. `/api/documents/upload` runs the full ingest→extract→link→gate pipeline synchronously so a demo shows real processing, not a spinner
+- `frontend/` — single-page vanilla HTML/JS/CSS dashboard served by Flask itself (`api/routes.py` mounts it as static root) — upload, per-document fields/case-file/discrepancies/audit tabs, and a natural-language chat dock, all against the real API
 - `tests/` — 53 passing unit tests covering the confidence gate, state-machine transitions, SQL validation, relationship rule-matching (and its Gemini fallback), OCR/PDF/plain-text ingestion, extraction/reasoning/action/chat agent call sites, and the shared `agents/llm_client.py` wrapper (all run without a live Exasol connection or API key; mocked at the `call_tool` boundary using real `google.genai.types` objects, and the OCR tests generate real image/PDF fixtures on the fly and run actual Tesseract on them)
-
-## Bugs fixed in this pass
-
-- **`GET /api/documents/<id>/fields` and `.../audit` returned 500.**
-  `database/queries.py` aliased columns as `AS value`, `AS action`, and
-  `AS timestamp` — all three are reserved words in Exasol SQL, so the
-  query failed to parse (`agents/chat.py`'s schema description already
-  warned about exactly this for the LLM-generated SQL path; the
-  hand-written queries in `queries.py` had the same bug). Fixed by
-  double-quoting the aliases (`AS "value"`, `AS "action"`, `AS
-  "timestamp"`).
-- **Chat requests returned 500 with `404 NOT_FOUND ... gemini-2.5-flash
-  is no longer available to new users`.** `EXTRACTION_MODEL`,
-  `REASONING_MODEL`, and `CHAT_MODEL` (in both `config.py`'s defaults and
-  `.env`) pointed at a retired Gemini model. Updated to
-  `gemini-3.6-flash`, the current stable Flash model as of this pass —
-  override via the same env vars if a newer one ships later.
 
 ## Sample data
 

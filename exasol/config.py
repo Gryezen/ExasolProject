@@ -81,12 +81,9 @@ def load_settings() -> Settings:
             schema=os.getenv("EXASOL_SCHEMA", "DOC_INTEL"),
         ),
         llm_api_key=_require("GEMINI_API_KEY"),
-        # gemini-2.5-flash was retired for new callers (404 NOT_FOUND at
-        # request time) — gemini-3.6-flash is the current stable Flash
-        # model as of Aug 2026. Override per-slot via env vars if needed.
-        extraction_model=os.getenv("EXTRACTION_MODEL", "gemini-3.6-flash"),
-        reasoning_model=os.getenv("REASONING_MODEL", "gemini-3.6-flash"),
-        chat_model=os.getenv("CHAT_MODEL", "gemini-3.6-flash"),
+        extraction_model=os.getenv("EXTRACTION_MODEL", "gemini-2.5-flash"),
+        reasoning_model=os.getenv("REASONING_MODEL", "gemini-2.5-flash"),
+        chat_model=os.getenv("CHAT_MODEL", "gemini-2.5-flash"),
         confidence_threshold=float(os.getenv("CONFIDENCE_THRESHOLD", "0.8")),
         upload_dir=os.getenv("UPLOAD_DIR", "./data/uploads"),
     )
