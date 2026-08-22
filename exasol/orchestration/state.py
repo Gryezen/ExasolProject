@@ -31,6 +31,6 @@ def set_status(db: Database, doc_id: str, new_status: str, current_status: str) 
             f"Cannot move doc {doc_id} from '{current_status}' to '{new_status}'"
         )
     db.execute(
-        "UPDATE DOCUMENTS SET status = :status, updated_at = CURRENT_TIMESTAMP WHERE doc_id = :doc_id",
+        "UPDATE DOCUMENTS SET status = {status}, updated_at = CURRENT_TIMESTAMP WHERE doc_id = {doc_id}",
         {"status": new_status, "doc_id": doc_id},
     )

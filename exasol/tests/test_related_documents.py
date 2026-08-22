@@ -39,5 +39,5 @@ def test_get_related_documents_sql_resolves_either_side_of_the_relationship():
     # The whole point of the CASE expression is symmetry — assert both
     # directions are present in the query so a future edit can't silently
     # drop one side and only surface half of a citizen's case file.
-    assert "r.doc_id_1 = :doc_id THEN r.doc_id_2" in GET_RELATED_DOCUMENTS_SQL
-    assert "r.doc_id_1 = :doc_id OR r.doc_id_2 = :doc_id" in GET_RELATED_DOCUMENTS_SQL
+    assert "r.doc_id_1 = {doc_id} THEN r.doc_id_2" in GET_RELATED_DOCUMENTS_SQL
+    assert "r.doc_id_1 = {doc_id} OR r.doc_id_2 = {doc_id}" in GET_RELATED_DOCUMENTS_SQL

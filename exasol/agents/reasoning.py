@@ -68,13 +68,13 @@ INSERT_DISCREPANCY_SQL = """
     INSERT INTO DISCREPANCIES
         (discrepancy_id, doc_id_1, doc_id_2, field_name, value_1, value_2, severity, status, explanation, detected_at)
     VALUES
-        (:discrepancy_id, :doc_id_1, :doc_id_2, :field_name, :value_1, :value_2, :severity, 'open', :explanation, CURRENT_TIMESTAMP)
+        ({discrepancy_id}, {doc_id_1}, {doc_id_2}, {field_name}, {value_1}, {value_2}, {severity}, 'open', {explanation}, CURRENT_TIMESTAMP)
 """
 
 GET_FIELDS_SQL = """
     SELECT field_name, field_value AS value, confidence
     FROM EXTRACTED_FIELDS
-    WHERE doc_id = :doc_id
+    WHERE doc_id = {doc_id}
 """
 
 

@@ -14,9 +14,9 @@ from database.db import Database
 
 INSERT_SQL = """
     INSERT INTO AUDIT_LOG
-        (log_id, doc_id, agent_name, action, input_summary, output_summary, confidence, timestamp)
+        (log_id, doc_id, agent_name, action_name, input_summary, output_summary, confidence, logged_at)
     VALUES
-        (:log_id, :doc_id, :agent_name, :action, :input_summary, :output_summary, :confidence, :timestamp)
+        ({log_id}, {doc_id}, {agent_name}, {action}, {input_summary}, {output_summary}, {confidence!f}, {timestamp})
 """
 
 
@@ -46,7 +46,9 @@ def log_event(
             "input_summary": (input_summary or "")[:2000],
             "output_summary": (output_summary or "")[:2000],
             "confidence": confidence,
-            "timestamp": datetime.now(timezone.utc),
+            # Exasol's default TIMESTAMP parser rejects the "+00:00" offset
+            # suffix a raw tz-aware datetime renders with, so format explicitly.
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S.%f"),
         },
     )
     return log_id

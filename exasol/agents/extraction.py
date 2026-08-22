@@ -72,13 +72,13 @@ INSERT_FIELD_SQL = """
     INSERT INTO EXTRACTED_FIELDS
         (field_id, doc_id, field_name, field_value, confidence, source_agent, extracted_at)
     VALUES
-        (:field_id, :doc_id, :field_name, :value, :confidence, :source_agent, CURRENT_TIMESTAMP)
+        ({field_id}, {doc_id}, {field_name}, {value}, {confidence!f}, {source_agent}, CURRENT_TIMESTAMP)
 """
 
 UPDATE_DOCUMENT_TYPE_SQL = """
     UPDATE DOCUMENTS
-    SET document_type = :document_type, vendor = :vendor, updated_at = CURRENT_TIMESTAMP
-    WHERE doc_id = :doc_id
+    SET document_type = {document_type}, vendor = {vendor}, updated_at = CURRENT_TIMESTAMP
+    WHERE doc_id = {doc_id}
 """
 
 

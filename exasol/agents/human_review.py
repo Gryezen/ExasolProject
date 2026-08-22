@@ -15,18 +15,18 @@ INSERT_REVIEW_SQL = """
     INSERT INTO HUMAN_REVIEWS
         (review_id, doc_id, field_id, field_name, ai_value, human_value, status, reviewed_by, reviewed_at)
     VALUES
-        (:review_id, :doc_id, :field_id, :field_name, :ai_value, :human_value, :status, :reviewed_by, CURRENT_TIMESTAMP)
+        ({review_id}, {doc_id}, {field_id}, {field_name}, {ai_value}, {human_value}, {status}, {reviewed_by}, CURRENT_TIMESTAMP)
 """
 
 UPDATE_FIELD_VALUE_SQL = """
     UPDATE EXTRACTED_FIELDS
-    SET field_value = :value, confidence = 1.0, source_agent = 'human_review'
-    WHERE field_id = :field_id
+    SET field_value = {value}, confidence = 1.0, source_agent = 'human_review'
+    WHERE field_id = {field_id}
 """
 
 GET_OPEN_REVIEWS_SQL = """
     SELECT field_id FROM EXTRACTED_FIELDS
-    WHERE doc_id = :doc_id AND confidence < :threshold
+    WHERE doc_id = {doc_id} AND confidence < {threshold!f}
 """
 
 

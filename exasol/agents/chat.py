@@ -28,7 +28,7 @@ DOCUMENT_RELATIONSHIPS(relationship_id, doc_id_1, doc_id_2, relationship_type, c
 DISCREPANCIES(discrepancy_id, doc_id_1, doc_id_2, field_name, value_1, value_2, severity, status, explanation, detected_at)
 ACTIONS(action_id, discrepancy_id, doc_id, action_type, content, status, created_at, decided_at, decided_by)
 HUMAN_REVIEWS(review_id, doc_id, field_id, field_name, ai_value, human_value, status, reviewed_by, reviewed_at)
-AUDIT_LOG(log_id, doc_id, agent_name, action, input_summary, output_summary, confidence, timestamp)
+AUDIT_LOG(log_id, doc_id, agent_name, action_name, input_summary, output_summary, confidence, logged_at)  -- note: columns are "action_name" and "logged_at", not "action"/"timestamp" (both reserved words in Exasol SQL)
 """
 
 _SQL_TOOL = {

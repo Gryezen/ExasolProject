@@ -48,13 +48,13 @@ INSERT_ACTION_SQL = """
     INSERT INTO ACTIONS
         (action_id, discrepancy_id, doc_id, action_type, content, status, created_at)
     VALUES
-        (:action_id, :discrepancy_id, :doc_id, :action_type, :content, 'proposed', CURRENT_TIMESTAMP)
+        ({action_id}, {discrepancy_id}, {doc_id}, {action_type}, {content}, 'proposed', CURRENT_TIMESTAMP)
 """
 
 GET_DISCREPANCY_SQL = """
     SELECT field_name, value_1, value_2, severity, explanation
     FROM DISCREPANCIES
-    WHERE discrepancy_id = :discrepancy_id
+    WHERE discrepancy_id = {discrepancy_id}
 """
 
 
@@ -130,8 +130,8 @@ def decide_action(db: Database, action_id: str, decision: str, decided_by: str) 
     db.execute(
         """
         UPDATE ACTIONS
-        SET status = :status, decided_at = CURRENT_TIMESTAMP, decided_by = :decided_by
-        WHERE action_id = :action_id
+        SET status = {status}, decided_at = CURRENT_TIMESTAMP, decided_by = {decided_by}
+        WHERE action_id = {action_id}
         """,
         {"status": decision, "decided_by": decided_by, "action_id": action_id},
     )

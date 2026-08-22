@@ -77,25 +77,25 @@ document types are unrelated (e.g. two unrelated invoices from the same vendor).
 GET_UNLINKED_CANDIDATES_SQL = """
     SELECT doc_id, document_type, vendor
     FROM DOCUMENTS
-    WHERE doc_id != :doc_id
+    WHERE doc_id != {doc_id}
       AND document_type IS NOT NULL
       AND status != 'failed'
 """
 
 CHECK_EXISTING_RELATIONSHIP_SQL = """
     SELECT relationship_id FROM DOCUMENT_RELATIONSHIPS
-    WHERE (doc_id_1 = :doc_a AND doc_id_2 = :doc_b)
-       OR (doc_id_1 = :doc_b AND doc_id_2 = :doc_a)
+    WHERE (doc_id_1 = {doc_a} AND doc_id_2 = {doc_b})
+       OR (doc_id_1 = {doc_b} AND doc_id_2 = {doc_a})
 """
 
 INSERT_RELATIONSHIP_SQL = """
     INSERT INTO DOCUMENT_RELATIONSHIPS
         (relationship_id, doc_id_1, doc_id_2, relationship_type, confidence, created_at)
     VALUES
-        (:relationship_id, :doc_id_1, :doc_id_2, :relationship_type, :confidence, CURRENT_TIMESTAMP)
+        ({relationship_id}, {doc_id_1}, {doc_id_2}, {relationship_type}, {confidence!f}, CURRENT_TIMESTAMP)
 """
 
-GET_DOC_INFO_SQL = "SELECT document_type, vendor FROM DOCUMENTS WHERE doc_id = :doc_id"
+GET_DOC_INFO_SQL = "SELECT document_type, vendor FROM DOCUMENTS WHERE doc_id = {doc_id}"
 
 
 class RelationshipCandidate:

@@ -24,9 +24,9 @@ from database.db import Database
 from orchestration.state import set_status
 
 GET_RELATED_DOCS_SQL = """
-    SELECT doc_id_2 FROM DOCUMENT_RELATIONSHIPS WHERE doc_id_1 = :doc_id
+    SELECT doc_id_2 FROM DOCUMENT_RELATIONSHIPS WHERE doc_id_1 = {doc_id}
     UNION
-    SELECT doc_id_1 FROM DOCUMENT_RELATIONSHIPS WHERE doc_id_2 = :doc_id
+    SELECT doc_id_1 FROM DOCUMENT_RELATIONSHIPS WHERE doc_id_2 = {doc_id}
 """
 
 

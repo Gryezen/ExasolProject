@@ -27,7 +27,7 @@ INSERT_DOCUMENT_SQL = """
     INSERT INTO DOCUMENTS
         (doc_id, filename, document_type, vendor, status, source_path, page_count, uploaded_by, uploaded_at, updated_at)
     VALUES
-        (:doc_id, :filename, :document_type, :vendor, :status, :source_path, :page_count, :uploaded_by, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        ({doc_id}, {filename}, {document_type}, {vendor}, {status}, {source_path}, {page_count!d}, {uploaded_by}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 """
 
 # Below this average Tesseract word-confidence, the scan is flagged in the
