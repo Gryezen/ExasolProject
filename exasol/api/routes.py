@@ -1,17 +1,27 @@
 """
-api/routes.py — thin Flask surface over the orchestrator, agents, and
-queries. This is intentionally not the full app (no auth, no file-upload
+api/routes.py — Flask surface over the orchestrator, agents, and queries.
+
+Two kinds of routes live here:
+  - Page routes (/, /upload, /documents/<id>/..., /chat) render Jinja
+    templates from templates/ — one template per screen in the demo flow
+    (dashboard -> upload -> extraction -> reasoning -> audit -> chat).
+  - JSON routes (/api/...) are unchanged from the original single-page
+    app; every page's JS calls these directly.
+
+This is intentionally not the full app (no auth, no file-upload
 streaming, no pagination) — it's enough for the frontend/demo owner to
-build the dashboard against real endpoints instead of mocks.
+build a real dashboard against real endpoints instead of mocks.
 
 Run standalone with `python -m api.routes`, or `flask --app api.routes run`.
+For production (e.g. Render), see Procfile / render.yaml — gunicorn
+serves `api.routes:app` the same way.
 """
 
 import os
 import uuid
 from pathlib import Path
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, abort, jsonify, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
 from agents import chat as chat_agent
@@ -22,22 +32,123 @@ from database.db import Database, ReadOnlyDatabase
 from database import queries
 from orchestration import workflow
 
-_FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
 _ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".txt"}
 
-app = Flask(__name__, static_folder=str(_FRONTEND_DIR), static_url_path="")
+app = Flask(
+    __name__,
+    template_folder=str(_PROJECT_ROOT / "templates"),
+    static_folder=str(_PROJECT_ROOT / "static"),
+    static_url_path="/static",
+)
 settings = load_settings()
 db = Database(settings)
 ro_db = ReadOnlyDatabase(settings)
 
-@app.route("/", methods=["GET"])
-def index():
-    """Serve the single-page dashboard. Kept as an explicit route (rather
-    than relying solely on Flask's static handler for '/') so a fresh
-    clone with no frontend/ directory still gives a clear 404 instead of
-    Flask's default error page.
+# Pipeline stages shown in the document-page stepper. Order matters —
+# it's the order stages render left to right.
+_STAGE_LABELS = ["Upload", "Extract", "Confidence", "Reasoning", "Complete"]
+
+
+def _stage_states(status: str) -> list[dict]:
+    """Map a document's status onto the 5-stage stepper the demo flow is
+    built around: Upload -> Extract -> Confidence -> Reasoning -> Complete.
+
+    'failed' can happen during ingestion or extraction, so it's shown as
+    an error on the Extract stage rather than guessing further — the
+    audit trail has the real detail.
     """
-    return send_from_directory(app.static_folder, "index.html")
+    order = ["uploaded", "extracting", "review", "reasoning", "complete"]
+    if status == "failed":
+        index = 1  # Extract
+        return [
+            {"label": label, "state": ("done" if i < index else "error" if i == index else "")}
+            for i, label in enumerate(_STAGE_LABELS)
+        ]
+    index = order.index(status) if status in order else 0
+    return [
+        {"label": label, "state": ("done" if i < index else "active" if i == index else "")}
+        for i, label in enumerate(_STAGE_LABELS)
+    ]
+
+
+@app.context_processor
+def inject_globals():
+    return {"confidence_threshold": settings.confidence_threshold}
+
+
+def _get_document_or_404(doc_id: str) -> dict:
+    row = queries.get_document(db, doc_id)
+    if row is None:
+        abort(404)
+    cols = ["doc_id", "filename", "document_type", "vendor", "status", "page_count", "uploaded_at"]
+    return _row_to_dict(row, cols)
+
+
+# ---------------------------------------------------------------- pages --
+
+@app.route("/", methods=["GET"])
+def dashboard():
+    stats_row = queries.get_stats(db, settings.confidence_threshold)
+    stats = _row_to_dict(stats_row, ["documents_total", "high_confidence_fields", "needs_review", "actions_triggered"])
+    return render_template("dashboard.html", active_nav="dashboard", stats=stats)
+
+
+@app.route("/upload", methods=["GET"])
+def upload_page():
+    return render_template(
+        "upload.html", active_nav="upload", allowed_extensions=sorted(_ALLOWED_EXTENSIONS)
+    )
+
+
+@app.route("/documents/<doc_id>", methods=["GET"])
+def document_root(doc_id: str):
+    """Bare doc URLs land on Extraction Results — the first screen a case
+    handler wants after upload."""
+    return redirect(url_for("document_extraction", doc_id=doc_id))
+
+
+@app.route("/documents/<doc_id>/extraction", methods=["GET"])
+def document_extraction(doc_id: str):
+    doc = _get_document_or_404(doc_id)
+    return render_template(
+        "document_extraction.html", active_nav="dashboard", doc=doc, stages=_stage_states(doc["status"])
+    )
+
+
+@app.route("/documents/<doc_id>/reasoning", methods=["GET"])
+def document_reasoning(doc_id: str):
+    doc = _get_document_or_404(doc_id)
+    return render_template(
+        "document_reasoning.html", active_nav="dashboard", doc=doc, stages=_stage_states(doc["status"])
+    )
+
+
+@app.route("/documents/<doc_id>/audit", methods=["GET"])
+def document_audit(doc_id: str):
+    doc = _get_document_or_404(doc_id)
+    return render_template(
+        "document_audit.html", active_nav="dashboard", doc=doc, stages=_stage_states(doc["status"])
+    )
+
+
+@app.route("/chat", methods=["GET"])
+def chat_page():
+    doc_id = request.args.get("doc")
+    doc_name = None
+    if doc_id:
+        row = queries.get_document(db, doc_id)
+        if row is not None:
+            doc_name = row[1]  # filename
+    return render_template(
+        "chat.html", active_nav="chat", prefill_doc_id=doc_id, prefill_doc_name=doc_name
+    )
+
+
+# -------------------------------------------------------------- json api --
+
+def _row_to_dict(row: tuple, columns: list[str]) -> dict:
+    return dict(zip(columns, row))
 
 
 @app.route("/api/config", methods=["GET"])
@@ -54,8 +165,13 @@ def get_config():
     )
 
 
-def _row_to_dict(row: tuple, columns: list[str]) -> dict:
-    return dict(zip(columns, row))
+@app.route("/api/stats", methods=["GET"])
+def get_stats():
+    """Dashboard summary numbers: documents processed, high-confidence
+    extractions, documents needing review, actions triggered."""
+    row = queries.get_stats(db, settings.confidence_threshold)
+    cols = ["documents_total", "high_confidence_fields", "needs_review", "actions_triggered"]
+    return jsonify(_row_to_dict(row, cols))
 
 
 @app.route("/api/documents", methods=["GET"])

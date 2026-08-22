@@ -1,0 +1,47 @@
+# Render Blueprint (https://render.com/docs/blueprint-spec).
+#
+# Deploy: push this repo to GitHub/GitLab, then in Render choose
+# "New +" -> "Blueprint" and point it at the repo. Render reads this
+# file and provisions the service below.
+#
+# IMPORTANT — read docs/DEPLOY.md before deploying. In particular:
+# EXASOL_DSN / EXASOL_RO_DSN must point to an Exasol instance Render's
+# servers can actually reach over the network. "localhost:8563" (the
+# Exasol Personal Local starter kit default) only works when the app
+# and the database are on the same machine — it will NOT work once the
+# app is running on Render. See docs/DEPLOY.md for options.
+
+services:
+  - type: web
+    name: doc-intel-platform
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /api/config
+    envVars:
+      - key: EXASOL_DSN
+        sync: false          # e.g. your-cluster.exasol.cloud:8563 — NOT localhost
+      - key: EXASOL_USER
+        sync: false
+      - key: EXASOL_PASSWORD
+        sync: false
+      - key: EXASOL_RO_DSN
+        sync: false          # can equal EXASOL_DSN if it's one cluster
+      - key: EXASOL_RO_USER
+        sync: false
+      - key: EXASOL_RO_PASSWORD
+        sync: false
+      - key: EXASOL_SCHEMA
+        value: DOC_INTEL
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: EXTRACTION_MODEL
+        value: gemini-3.6-flash
+      - key: REASONING_MODEL
+        value: gemini-3.6-flash
+      - key: CHAT_MODEL
+        value: gemini-3.6-flash
+      - key: CONFIDENCE_THRESHOLD
+        value: "0.8"
+      - key: UPLOAD_DIR
+        value: /app/data/uploads

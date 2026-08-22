@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-inner">
+  <div class="eyebrow">Citizen case registry</div>
+  <h1 class="page-title">Dashboard</h1>
+  <p class="page-sub">Document intelligence for citizen case files — extraction · confidence · reasoning · action · audit.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="num" id="statTotal">{{ stats.documents_total }}</div><div class="label">Documents processed</div></div>
+    <div class="stat-card"><div class="num" id="statHighConf">{{ stats.high_confidence_fields }}</div><div class="label">High-confidence extractions</div></div>
+    <div class="stat-card"><div class="num" id="statReview">{{ stats.needs_review }}</div><div class="label">Needs review</div></div>
+    <div class="stat-card"><div class="num" id="statActions">{{ stats.actions_triggered }}</div><div class="label">Actions triggered</div></div>
+  </div>
+
+  <div class="section-head">
+    <h2>How it works</h2>
+  </div>
+  <div class="stepper" style="margin-top:0;">
+    <div class="stage done"><div class="circle">1</div><div class="label">Upload</div></div>
+    <div class="connector done"></div>
+    <div class="stage done"><div class="circle">2</div><div class="label">Extract</div></div>
+    <div class="connector done"></div>
+    <div class="stage done"><div class="circle">3</div><div class="label">Confidence check</div></div>
+    <div class="connector done"></div>
+    <div class="stage done"><div class="circle">4</div><div class="label">Reasoning</div></div>
+    <div class="connector done"></div>
+    <div class="stage done"><div class="circle">5</div><div class="label">Audit &amp; actions</div></div>
+  </div>
+
+  <div class="section-head">
+    <h2>Recent documents</h2>
+    <span class="count" id="docCount"></span>
+    <div class="spacer"></div>
+    <a class="btn primary" href="{{ url_for('upload_page') }}">+ Upload document</a>
+  </div>
+
+  <table class="doc-table" id="docTable" style="display:none;">
+    <thead>
+      <tr><th>Document</th><th>Type</th><th>Vendor</th><th>Status</th><th>Uploaded</th></tr>
+    </thead>
+    <tbody id="docTableBody"></tbody>
+  </table>
+  <div class="empty-list" id="docEmpty" style="display:none;">No documents yet. Upload a certificate, application or receipt to start the pipeline.</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

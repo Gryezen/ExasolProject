@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}CASE_REGISTRY{% endblock %} — Document Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<div class="tricolour-strip"><span class="saffron"></span><span class="white"></span><span class="green"></span></div>
+
+<svg class="chakra-watermark" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <circle cx="300" cy="300" r="280" fill="none" stroke="currentColor" stroke-width="6"/>
+  <circle cx="300" cy="300" r="26" fill="none" stroke="currentColor" stroke-width="5"/>
+  <circle cx="300" cy="300" r="6" fill="currentColor"/>
+  <line x1="300.0" y1="274.0" x2="300.0" y2="40.0" stroke="currentColor" stroke-width="5"/>
+  <line x1="306.7" y1="274.9" x2="367.3" y2="48.9" stroke="currentColor" stroke-width="5"/>
+  <line x1="313.0" y1="277.5" x2="430.0" y2="74.8" stroke="currentColor" stroke-width="5"/>
+  <line x1="318.4" y1="281.6" x2="483.8" y2="116.2" stroke="currentColor" stroke-width="5"/>
+  <line x1="322.5" y1="287.0" x2="525.2" y2="170.0" stroke="currentColor" stroke-width="5"/>
+  <line x1="325.1" y1="293.3" x2="551.1" y2="232.7" stroke="currentColor" stroke-width="5"/>
+  <line x1="326.0" y1="300.0" x2="560.0" y2="300.0" stroke="currentColor" stroke-width="5"/>
+  <line x1="325.1" y1="306.7" x2="551.1" y2="367.3" stroke="currentColor" stroke-width="5"/>
+  <line x1="322.5" y1="313.0" x2="525.2" y2="430.0" stroke="currentColor" stroke-width="5"/>
+  <line x1="318.4" y1="318.4" x2="483.8" y2="483.8" stroke="currentColor" stroke-width="5"/>
+  <line x1="313.0" y1="322.5" x2="430.0" y2="525.2" stroke="currentColor" stroke-width="5"/>
+  <line x1="306.7" y1="325.1" x2="367.3" y2="551.1" stroke="currentColor" stroke-width="5"/>
+  <line x1="300.0" y1="326.0" x2="300.0" y2="560.0" stroke="currentColor" stroke-width="5"/>
+  <line x1="293.3" y1="325.1" x2="232.7" y2="551.1" stroke="currentColor" stroke-width="5"/>
+  <line x1="287.0" y1="322.5" x2="170.0" y2="525.2" stroke="currentColor" stroke-width="5"/>
+  <line x1="281.6" y1="318.4" x2="116.2" y2="483.8" stroke="currentColor" stroke-width="5"/>
+  <line x1="277.5" y1="313.0" x2="74.8" y2="430.0" stroke="currentColor" stroke-width="5"/>
+  <line x1="274.9" y1="306.7" x2="48.9" y2="367.3" stroke="currentColor" stroke-width="5"/>
+  <line x1="274.0" y1="300.0" x2="40.0" y2="300.0" stroke="currentColor" stroke-width="5"/>
+  <line x1="274.9" y1="293.3" x2="48.9" y2="232.7" stroke="currentColor" stroke-width="5"/>
+  <line x1="277.5" y1="287.0" x2="74.8" y2="170.0" stroke="currentColor" stroke-width="5"/>
+  <line x1="281.6" y1="281.6" x2="116.2" y2="116.2" stroke="currentColor" stroke-width="5"/>
+  <line x1="287.0" y1="277.5" x2="170.0" y2="74.8" stroke="currentColor" stroke-width="5"/>
+  <line x1="293.3" y1="274.9" x2="232.7" y2="48.9" stroke="currentColor" stroke-width="5"/>
+</svg>
+
+<div class="shell">
+  <header class="top">
+    <div class="mark"><a href="{{ url_for('dashboard') }}">CASE_REGISTRY<span class="stamp">office copy</span></a></div>
+    <nav class="primary-nav">
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if active_nav == 'dashboard' else '' }}">Dashboard</a>
+      <a href="{{ url_for('upload_page') }}" class="{{ 'active' if active_nav == 'upload' else '' }}">Upload</a>
+      <a href="{{ url_for('chat_page') }}" class="{{ 'active' if active_nav == 'chat' else '' }}">Chat</a>
+    </nav>
+    <div class="spacer"></div>
+    <div class="threshold">confidence gate ≥ {{ confidence_threshold }}</div>
+  </header>
+
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

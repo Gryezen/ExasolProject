@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Chat{% endblock %}
+{% block content %}
+<div class="page-inner">
+  <div class="eyebrow">Ask the registry</div>
+  <h1 class="page-title">Chat</h1>
+  <p class="page-sub">Ask a plain-language question. It's translated into a single read-only SQL query, run against Exasol, and logged to the audit trail — the query never has write access.</p>
+
+  <div class="chat-panel">
+    <form class="chat-form" id="chatForm">
+      <input type="text" id="chatInput" placeholder="e.g. Show all welfare applicants earning below ₹2,00,000">
+      <button type="submit" class="primary">Ask</button>
+    </form>
+    <div class="chat-examples" id="chatExamples"></div>
+    <div class="chat-history" id="chatHistory"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>window.PREFILL_DOC_ID = {{ prefill_doc_id | tojson }}; window.PREFILL_DOC_NAME = {{ prefill_doc_name | tojson }};</script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

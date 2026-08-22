@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "_doc_nav.html" as nav %}
+{% block title %}Audit trail — {{ doc.filename }}{% endblock %}
+{% block content %}
+<div class="page-inner">
+  {{ nav.doc_nav(doc, "audit", stages) }}
+
+  <div class="doc-tab-panel">
+    <div class="section-head" style="margin-top:0;">
+      <h2>Audit trail</h2>
+    </div>
+    <p class="page-sub" style="margin-bottom:16px;">Uploaded → Ingested → Extracted → Validated → Confidence checked → Action — every step any agent took on this document, in order, written to Exasol's AUDIT_LOG.</p>
+    <div id="panel-audit"><div class="empty-panel">Loading…</div></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>window.DOC_ID = {{ doc.doc_id | tojson }}; window.CONFIDENCE_THRESHOLD = {{ confidence_threshold | tojson }};</script>
+<script src="{{ url_for('static', filename='js/document.js') }}"></script>
+<script src="{{ url_for('static', filename='js/document_audit.js') }}"></script>
+{% endblock %}

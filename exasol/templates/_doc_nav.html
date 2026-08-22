@@ -1,0 +1,28 @@
+{% macro doc_nav(doc, active_tab, stages) %}
+<div class="doc-header">
+  <div>
+    <div class="title">{{ doc.filename }}</div>
+    <div class="sub">
+      <span class="mono">{{ doc.doc_id }}</span>
+      · {{ doc.document_type or "unclassified" }}
+      {% if doc.vendor %}· {{ doc.vendor }}{% endif %}
+      · <span class="badge {{ doc.status }}">{{ doc.status }}</span>
+    </div>
+  </div>
+  <div class="actions" id="docActions"></div>
+</div>
+
+<div class="stepper">
+  {% for stage in stages %}
+    <div class="stage {{ stage.state }}"><div class="circle">{% if stage.state == 'done' %}✓{% elif stage.state == 'error' %}!{% else %}{{ loop.index }}{% endif %}</div><div class="label">{{ stage.label }}</div></div>
+    {% if not loop.last %}<div class="connector {{ 'done' if stage.state == 'done' else '' }}"></div>{% endif %}
+  {% endfor %}
+</div>
+
+<nav class="doc-tabs">
+  <a href="/documents/{{ doc.doc_id }}/extraction" class="{{ 'active' if active_tab == 'extraction' else '' }}">Extraction Results<span class="count" id="countFields"></span></a>
+  <a href="/documents/{{ doc.doc_id }}/reasoning" class="{{ 'active' if active_tab == 'reasoning' else '' }}">Reasoning &amp; Actions<span class="count" id="countDisc"></span></a>
+  <a href="/documents/{{ doc.doc_id }}/audit" class="{{ 'active' if active_tab == 'audit' else '' }}">Audit Trail<span class="count" id="countAudit"></span></a>
+  <a href="/chat?doc={{ doc.doc_id }}">Ask about this document</a>
+</nav>
+{% endmacro %}

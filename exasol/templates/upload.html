@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Upload{% endblock %}
+{% block content %}
+<div class="page-inner">
+  <div class="eyebrow">Step 1 of 5</div>
+  <h1 class="page-title">Upload a document</h1>
+  <p class="page-sub">Certificates, applications, receipts, bids and land records are accepted. Each upload runs the full pipeline — ingestion, AI extraction and a confidence check — before you see results.</p>
+
+  <label class="dropzone" id="dropzone">
+    <input type="file" id="fileInput" accept="{{ allowed_extensions | join(',') }}">
+    <div class="big">Drop a file here, or click to browse</div>
+    <div class="hint">Accepted: {{ allowed_extensions | join(', ') }}</div>
+  </label>
+
+  <div class="pipeline-progress" id="progress" style="display:none;">
+    <div class="step" data-step="upload"><div class="dot"></div><div>Uploading file</div></div>
+    <div class="step" data-step="ingest"><div class="dot"></div><div>Ingesting document (OCR / text extraction)</div></div>
+    <div class="step" data-step="extract"><div class="dot"></div><div>Extracting fields with AI</div></div>
+    <div class="step" data-step="link"><div class="dot"></div><div>Linking related case documents</div></div>
+    <div class="step" data-step="confidence"><div class="dot"></div><div>Running confidence gate</div></div>
+  </div>
+
+  <div class="upload-result" id="uploadResult" style="display:none;"></div>
+
+  <p class="recent-uploads-hint">Already uploaded something? See it on the <a class="link" href="{{ url_for('dashboard') }}">dashboard</a>.</p>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+{% endblock %}
