@@ -167,7 +167,10 @@ def process_document(doc_id: str):
     upload time via orchestration.workflow.process_new_document, called
     from wherever file upload is handled (not in this minimal API).
     """
-    result = workflow.compare_related_documents(db, settings, doc_id)
+    try:
+        result = workflow.compare_related_documents(db, settings, doc_id)
+    except Exception as e:
+        return jsonify({"error": f"comparison failed: {e}"}), 500
     return jsonify(result)
 
 
@@ -179,17 +182,20 @@ def submit_review():
     if missing:
         return jsonify({"error": f"missing fields: {missing}"}), 400
 
-    review_id = human_review_agent.submit_review(
-        db,
-        doc_id=body["doc_id"],
-        field_id=body["field_id"],
-        field_name=body["field_name"],
-        ai_value=body["ai_value"],
-        human_value=body["human_value"],
-        status=body["status"],
-        reviewed_by=body["reviewed_by"],
-    )
-    human_review_agent.advance_if_reviews_complete(db, body["doc_id"], settings.confidence_threshold)
+    try:
+        review_id = human_review_agent.submit_review(
+            db,
+            doc_id=body["doc_id"],
+            field_id=body["field_id"],
+            field_name=body["field_name"],
+            ai_value=body["ai_value"],
+            human_value=body["human_value"],
+            status=body["status"],
+            reviewed_by=body["reviewed_by"],
+        )
+        human_review_agent.advance_if_reviews_complete(db, body["doc_id"], settings.confidence_threshold)
+    except Exception as e:
+        return jsonify({"error": f"review submission failed: {e}"}), 500
     return jsonify({"review_id": review_id})
 
 
@@ -200,7 +206,10 @@ def decide_action(action_id: str):
     decided_by = body.get("decided_by", "unknown")
     if decision not in ("approved", "rejected"):
         return jsonify({"error": "decision must be 'approved' or 'rejected'"}), 400
-    action_agent.decide_action(db, action_id, decision, decided_by)
+    try:
+        action_agent.decide_action(db, action_id, decision, decided_by)
+    except Exception as e:
+        return jsonify({"error": f"decision failed: {e}"}), 500
     return jsonify({"action_id": action_id, "status": decision})
 
 
@@ -210,7 +219,10 @@ def chat():
     question = body.get("question")
     if not question:
         return jsonify({"error": "missing 'question'"}), 400
-    result = chat_agent.ask(db, ro_db, settings, question)
+    try:
+        result = chat_agent.ask(db, ro_db, settings, question)
+    except Exception as e:
+        return jsonify({"error": f"query failed: {e}"}), 500
     return jsonify(result)
 
 

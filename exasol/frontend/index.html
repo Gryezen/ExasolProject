@@ -1727,7 +1727,7 @@ document.addEventListener('drop', e => {
 
 async function uploadFiles(files){
   const status = document.getElementById('uploadStatus');
-  let okCount = 0, lastDocId = null;
+  let okCount = 0, lastDocId = null, lastNote = '';
   for(let i=0;i<files.length;i++){
     const file = files[i];
     if(status) status.textContent = files.length>1 ? `ingesting ${file.name} (${i+1} of ${files.length})…` : `ingesting ${file.name}…`;
@@ -1743,7 +1743,11 @@ async function uploadFiles(files){
       // Auto-approved docs sit in 'reasoning' — run the compare+action-draft step now
       // so the pipeline actually completes instead of stalling until someone visits Cases.
       if(result.gate_decision === 'AUTO_APPROVE'){
-        await apiPost(`/api/documents/${result.doc_id}/process`).catch(()=>{});
+        try{
+          await apiPost(`/api/documents/${result.doc_id}/process`);
+        }catch(e){
+          lastNote = ` — comparison step failed (${e.message}); retry from the Case page`;
+        }
       }
     }catch(e){
       if(status) status.textContent = `${file.name} failed: ${e.message}`;
@@ -1754,8 +1758,15 @@ async function uploadFiles(files){
   const fileInput = document.getElementById('fileInput');
   if(fileInput) fileInput.value = '';
   await loadSnapshot(true);
-  if(status) status.textContent = files.length>1 ? `done — ${okCount} of ${files.length} file(s) ingested` : `done — ${files[0].name} ingested`;
-  if(lastDocId) openCase(lastDocId); else show('documents');
+  const finalMsg = (files.length>1 ? `done — ${okCount} of ${files.length} file(s) ingested` : `done — ${files[0].name} ingested`) + lastNote;
+  if(lastNote){
+    // Stay put so the failure note is actually visible instead of being wiped by navigation.
+    show('documents').then(() => { const s = document.getElementById('uploadStatus'); if(s) s.textContent = finalMsg; });
+  }else if(lastDocId){
+    openCase(lastDocId);
+  }else{
+    show('documents');
+  }
 }
 
 async function runComparison(docId){
@@ -1788,8 +1799,12 @@ async function confirmReview(){
     // If that was the doc's last open review, it's now sitting in 'reasoning' — advance it.
     const doc = await apiGet(`/api/documents/${current.doc_id}`).catch(()=>null);
     if(doc && doc.status === 'reasoning'){
-      await apiPost(`/api/documents/${current.doc_id}/process`).catch(()=>{});
-      await loadSnapshot(true);
+      try{
+        await apiPost(`/api/documents/${current.doc_id}/process`);
+        await loadSnapshot(true);
+      }catch(e){
+        alert(`Review recorded, but the comparison step failed: ${e.message}\nYou can retry from ${caseLabel(current.doc_id)}'s Case page.`);
+      }
     }
   }catch(e){
     alert(`Couldn't record review: ${e.message}`);
@@ -1845,7 +1860,7 @@ async function runQuery(){
       <div class="kb-sources"><span class="kb-source">${escapeHtml(res.sql||'')}</span></div>
     `;
   }catch(e){
-    result.innerHTML = `<div class="notice" style="border-color:var(--red)">Query failed: ${escapeHtml(e.message)}</div>`;
+    result.innerHTML = `<div class="notice" style="border-color:var(--red)">${escapeHtml(e.message)}</div>`;
   }
 }
 
