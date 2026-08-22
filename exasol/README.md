@@ -108,7 +108,25 @@ python main.py
 ```
 
 Expected output: read-write connection confirmed, read-only connection
-confirmed, `DOCUMENTS` row count printed.
+confirmed, `DOCUMENTS` row count printed. This step only checks
+connectivity — it does not start the app.
+
+### 6. Run the dashboard
+
+```bash
+python -m api.routes
+```
+
+Run this from the project root (not from inside `api/`) — the app uses
+absolute imports like `from agents import chat as chat_agent`, which only
+resolve correctly when the project root is on `sys.path`, and `-m`
+guarantees that. Running `python api/routes.py` directly will fail with
+`ModuleNotFoundError: No module named 'agents'`.
+
+Once it's running, open **http://localhost:5000** in a browser — that's
+the whole app: Flask serves the `frontend/index.html` dashboard at `/`
+and the JSON API under `/api/...` from the same process, so there's
+nothing separate to start for the frontend.
 
 ## Reliability rules this project follows
 

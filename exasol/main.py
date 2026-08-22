@@ -1,13 +1,17 @@
 """
-main.py — entry point.
+main.py — connection/setup verification only.
 
-Right now this just proves the wiring works end to end: load config, connect
-read-write and read-only, confirm DOC_INTEL exists. Once agents/ingestion.py
-and agents/extraction.py land, this becomes the CLI/API entry point that
-drives orchestration/workflow.py.
+Confirms config loads, both the read-write and read-only (chat-agent)
+Exasol identities connect, and DOC_INTEL is reachable. This is NOT the
+app entry point — it doesn't start the Flask server or serve the
+dashboard.
 
 Run:
     python main.py
+
+To actually run the dashboard, use `python -m api.routes` from the
+project root instead (see README step 6), then open
+http://localhost:5005.
 """
 
 import sys
@@ -43,7 +47,8 @@ def main() -> int:
 
     doc_count = db.fetchall("SELECT COUNT(*) FROM DOCUMENTS")[0][0]
     print(f"DOCUMENTS table reachable. Current row count: {doc_count}")
-    print("\nSetup verified. Next: agents/ingestion.py + agents/extraction.py.")
+    print("\nSetup verified. Run the dashboard with:  python -m api.routes")
+    print("Then open http://localhost:5005 in a browser.")
     return 0
 
 
